@@ -5,6 +5,11 @@ from django.conf import settings
 from bot.models import Cart, Character, User
 
 
+async def get_random_cart(cart_type: str) -> Cart:
+    """Метод получения случайной карты."""
+    return await Cart.objects.filter(type=cart_type).order_by("?").afirst()
+
+
 async def generate_character(user: User):
     """Метод генерации случайного персонажа."""
     good_health = randint(1, 100) <= settings.HEALTH_CHANCE
@@ -12,39 +17,17 @@ async def generate_character(user: User):
     getero_orientation = randint(1, 100) < settings.ORIENTATION_CHANCE
     age = randint(settings.MIN_AGE_VALUE, settings.MAX_AGE_VALUE)
 
-    gender = (
-        await Cart.objects.filter(type="gender_cart").order_by("?").afirst()
-    )
-    orientation = (
-        await Cart.objects.filter(type="orientation_cart")
-        .order_by("?")
-        .afirst()
-    )
-    profession = (
-        await Cart.objects.filter(type="prof_cart").order_by("?").afirst()
-    )
-    health = (
-        await Cart.objects.filter(type="health_cart").order_by("?").afirst()
-    )
-    phobia = (
-        await Cart.objects.filter(type="phobia_cart").order_by("?").afirst()
-    )
-    personality = (
-        await Cart.objects.filter(type="personality_cart")
-        .order_by("?")
-        .afirst()
-    )
-    hobby = await Cart.objects.filter(type="hobby_cart").order_by("?").afirst()
-    information = (
-        await Cart.objects.filter(type="ad_info_cart").order_by("?").afirst()
-    )
-    item = await Cart.objects.filter(type="item_cart").order_by("?").afirst()
-    action_one = (
-        await Cart.objects.filter(type="action_cart").order_by("?").afirst()
-    )
-    action_two = (
-        await Cart.objects.filter(type="action_cart").order_by("?").afirst()
-    )
+    gender = await get_random_cart("gender_cart")
+    orientation = await get_random_cart("orientation_cart")
+    profession = await get_random_cart("prof_cart")
+    health = await get_random_cart("health_cart")
+    phobia = await get_random_cart("phobia_cart")
+    personality = await get_random_cart("personality_cart")
+    hobby = await get_random_cart("hobby_cart")
+    information = await get_random_cart("ad_info_cart")
+    item = await get_random_cart("item_cart")
+    action_one = await get_random_cart("action_cart")
+    action_two = await get_random_cart("action_cart")
 
     if good_health:
         health = await Cart.objects.aget(name="Полностью здоров.")
