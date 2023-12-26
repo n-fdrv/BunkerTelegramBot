@@ -15,7 +15,7 @@ class BaseCallbackData(CallbackData, prefix="pac"):
 class RoomCallbackData(BaseCallbackData, prefix="r"):
     """Callback_data для комнат."""
 
-    pass
+    player_id: Optional[int] = None
 
 
 CALLBACK_DATA_PREFIX = {

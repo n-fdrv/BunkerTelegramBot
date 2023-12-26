@@ -8,8 +8,10 @@ from bot.constants.messages import (
     ENTER_ROOM_SLUG_MESSAGE,
     NOT_CREATED_ROOM_MESSAGE,
     PLAYER_LEFT_ROOM_MESSAGE,
+    ROOM_GET_MESSAGE,
     ROOM_IS_CLOSED_MESSAGE,
     START_MESSAGE,
+    YOU_LEFT_ROOM_MESSAGE,
 )
 from bot.constants.states import RoomState
 from bot.keyboards import inline_keyboards
@@ -63,16 +65,26 @@ async def create_room_handler(message: types.Message, state: FSMContext):
 
 @router.message(Command("my_room"))
 @log_in_dev
-async def show_room_admin_command(message: types.Message, state: FSMContext):
-    """Хендлер просмотра комнаты администратором."""
+async def show_room_command(message: types.Message, state: FSMContext):
+    """Хендлер просмотра комнаты."""
     await state.clear()
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=message.from_user.id
     )
-    keyboard = await inline_keyboards.room_admin_keyboard(user.room)
-    await message.answer(
-        text=f"Комната №{user.room.slug}", reply_markup=keyboard.as_markup()
+    players_amount = await User.objects.filter(room=user.room).acount()
+    players_info = ""
+    async for player in User.objects.filter(room=user.room).all():
+        players_info += f"- {get_user_url(player)}\n"
+    text = ROOM_GET_MESSAGE.format(
+        user.room.slug, players_amount, players_info
     )
+    if user.room.admin == user:
+        keyboard = await inline_keyboards.room_admin_keyboard()
+        await message.answer(
+            text=text, reply_markup=keyboard.as_markup(), parse_mode="Markdown"
+        )
+        return
+    await message.answer(text=text, parse_mode="Markdown")
 
 
 @router.message(Command("enter_room"))
@@ -106,6 +118,7 @@ async def leave_room_command(message: types.Message, state: FSMContext):
         return
     user.room = None
     await user.asave()
+    await message.answer(text=YOU_LEFT_ROOM_MESSAGE.format(room.slug))
     async for player in User.objects.filter(room=room):
         await message.bot.send_message(
             chat_id=player.telegram_id,

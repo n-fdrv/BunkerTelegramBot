@@ -19,7 +19,7 @@ def setup_logger():
     )
 
 
-def log_in_dev(func):
+def log_in_dev(func: object) -> object:
     """Декоратор для логирования обработчиков."""
 
     async def wrapper(*args, **kwargs):

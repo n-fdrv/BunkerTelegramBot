@@ -32,3 +32,7 @@ GAME_STARTED_MESSAGE = (
 )
 ROOM_IS_CLOSED_MESSAGE = "Ваша комната была закрыта администратором - {}"
 PLAYER_LEFT_ROOM_MESSAGE = "{} вышел из комнаты."
+ROOM_GET_MESSAGE = "Комната №{}\n" "Количество игроков: {}\n" "{}"
+YOU_LEFT_ROOM_MESSAGE = "Ты успешно вышел из комнаты №{}"
+KICKED_USER_MESSAGE = "Тебя выгнали из комнаты"
+MESSAGE_ABOUT_KICKED_PLAYER = "Администратор комнаты выгнал игрока - {}"

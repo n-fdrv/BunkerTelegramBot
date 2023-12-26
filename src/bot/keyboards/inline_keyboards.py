@@ -7,25 +7,6 @@ from bot.models import Room, User
 from bot.utils.back_button_builder import back_builder
 
 
-async def start_keyboard():
-    """Метод формирования основной клавиатуры."""
-    keyboard = InlineKeyboardBuilder()
-    keyboard.button(
-        text=buttons.ENTER_ROOM_BUTTON,
-        callback_data=RoomCallbackData(action=room_action.enter),
-    )
-    keyboard.button(
-        text=buttons.CREATE_ROOM_BUTTON,
-        callback_data=RoomCallbackData(action=room_action.create),
-    )
-    keyboard.button(
-        text=buttons.RULES_BUTTON,
-        callback_data=RoomCallbackData(action=room_action.rules),
-    )
-    keyboard.adjust(1)
-    return keyboard
-
-
 async def cancel_state_keyboard():
     """Метод формирования выхода из комнаты/отмены состояния входа."""
     keyboard = InlineKeyboardBuilder()
@@ -37,23 +18,18 @@ async def cancel_state_keyboard():
     return keyboard
 
 
-async def room_admin_keyboard(room: Room):
+async def room_admin_keyboard():
     """Метод формирования клавиатуры администратора комнаты."""
     keyboard = InlineKeyboardBuilder()
-    players_amount = await User.objects.filter(room=room).acount()
     keyboard.button(
         text=buttons.BEGIN_BUTTON,
         callback_data=RoomCallbackData(action=room_action.begin),
     )
     keyboard.button(
-        text=buttons.PLAYERS_BUTTON.format(players_amount),
+        text=buttons.DISMISS_PLAYERS_BUTTON,
         callback_data=RoomCallbackData(
             action=room_action.players,
         ),
-    )
-    keyboard.button(
-        text=buttons.CLOSE_ROOM_BUTTON,
-        callback_data=RoomCallbackData(action=room_action.close_room),
     )
     keyboard.adjust(1)
     return keyboard
@@ -66,15 +42,19 @@ async def show_players_keyboard(room: Room):
     async for player in User.objects.filter(room=room).all():
         keyboard.button(
             text=f"{player.first_name} {player.last_name}",
-            callback_data=RoomCallbackData(action=room_action.player_get),
+            callback_data=RoomCallbackData(
+                action=room_action.player_get, player_id=player.telegram_id
+            ),
         )
-        btn_text = buttons.DISMISS_PLAYER
+        btn_text = buttons.DISMISS_BUTTON
+        btn_action = room_action.player_kick
         if room.admin == player:
             btn_text = "Администратор"
+            btn_action = room_action.player_get
         keyboard.button(
             text=btn_text,
             callback_data=RoomCallbackData(
-                action=room_action.player_kick,
+                action=btn_action, player_id=player.telegram_id
             ),
         )
         rows.append(2)
