@@ -28,7 +28,7 @@ async def start_game_callback(
     await callback.message.answer(text=text)
     if not started:
         return
-    keyboard = await game_keyboard()
+    keyboard = await game_keyboard(callback_data=callback_data)
     async for player in User.objects.filter(room=user.room).all():
         await callback.message.bot.send_message(
             chat_id=player.telegram_id,
@@ -50,7 +50,7 @@ async def get_character_callback(
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=callback.from_user.id
     )
-    keyboard = await game_keyboard()
+    keyboard = await game_keyboard(callback_data=callback_data)
     character = await Character.objects.select_related(
         "profession",
         "gender",
@@ -96,7 +96,7 @@ async def get_epidemia_callback(
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=callback.from_user.id
     )
-    keyboard = await game_keyboard()
+    keyboard = await game_keyboard(callback_data=callback_data)
     game = await Game.objects.select_related("epidemia").aget(
         room=user.room, is_closed=False
     )
@@ -121,14 +121,19 @@ async def get_bunker_callback(
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=callback.from_user.id
     )
-    keyboard = await game_keyboard()
+    keyboard = await game_keyboard(callback_data=callback_data)
     game = await Game.objects.select_related(
         "bunker_type", "room_one", "room_two", "room_three"
     ).aget(room=user.room, is_closed=False)
-    # TODO количество мест в бункере
+    players_count = await User.objects.filter(room=user.room).acount()
+    bunker_place = players_count // 2
     await callback.message.edit_text(
         text=messages.BUNKER_GET_MESSAGE.format(
-            game.bunker_type, game.room_one, game.room_two, game.room_three
+            game.bunker_type,
+            bunker_place,
+            game.room_one,
+            game.room_two,
+            game.room_three,
         ),
         reply_markup=keyboard.as_markup(),
     )
