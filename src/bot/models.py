@@ -107,6 +107,9 @@ class Game(models.Model):
         verbose_name="Тип катастрофы",
         related_name="epidemia",
     )
+    epidemia_time = models.IntegerField(
+        verbose_name="Лет до выхода на поверхность"
+    )
     bunker_type = models.ForeignKey(
         Cart(type="bunker_type_cart"),
         on_delete=models.CASCADE,

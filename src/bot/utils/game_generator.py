@@ -13,6 +13,7 @@ async def get_random_cart(cart_type: str) -> Cart:
 async def generate_game(room: Room):
     """Метод генерации случайной игры."""
     epidemia = await get_random_cart("epidemia_type")
+    epidemia_time = randint(1, 10)
     bunker = await get_random_cart("bunker_type_cart")
     room_one = await get_random_cart("room_cart")
     room_two = await get_random_cart("room_cart")
@@ -21,6 +22,7 @@ async def generate_game(room: Room):
     return await Game.objects.acreate(
         room=room,
         epidemia=epidemia,
+        epidemia_time=epidemia_time,
         bunker_type=bunker,
         room_one=room_one,
         room_two=room_two,

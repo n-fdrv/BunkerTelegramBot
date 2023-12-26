@@ -6,7 +6,7 @@ from bot.constants.actions import game_action
 from bot.constants.callback_data import GameCallbackData
 from bot.constants.messages import CHARACTER_GET_MESSAGE
 from bot.keyboards.inline_keyboards import game_keyboard
-from bot.models import Character, User
+from bot.models import Character, Game, User
 from bot.utils.game_helpers import start_game
 from core.config.logging import log_in_dev
 
@@ -50,8 +50,21 @@ async def get_character_callback(
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=callback.from_user.id
     )
-    character = await Character.objects.aget(user=user, room=user.room)
-    await callback.message.answer(
+    keyboard = await game_keyboard()
+    character = await Character.objects.select_related(
+        "profession",
+        "gender",
+        "orientation",
+        "health",
+        "phobia",
+        "hobby",
+        "personality",
+        "information",
+        "item",
+        "action_one",
+        "action_two",
+    ).aget(user=user, room=user.room)
+    await callback.message.edit_text(
         text=CHARACTER_GET_MESSAGE.format(
             character.profession,
             character.gender,
@@ -65,5 +78,57 @@ async def get_character_callback(
             character.item,
             character.action_one,
             character.action_two,
-        )
+        ),
+        reply_markup=keyboard.as_markup(),
+    )
+
+
+@router.callback_query(
+    GameCallbackData.filter(F.action == game_action.get_epidemia)
+)
+@log_in_dev
+async def get_epidemia_callback(
+    callback: types.CallbackQuery,
+    state: FSMContext,
+    callback_data: GameCallbackData,
+):
+    """Хендлер просмотра катастрофы."""
+    user = await User.objects.select_related("room", "room__admin").aget(
+        telegram_id=callback.from_user.id
+    )
+    keyboard = await game_keyboard()
+    game = await Game.objects.select_related("epidemia").aget(
+        room=user.room, is_closed=False
+    )
+    await callback.message.edit_text(
+        text=messages.EPIDEMIA_GET_MESSAGE.format(
+            game.epidemia, game.epidemia_time
+        ),
+        reply_markup=keyboard.as_markup(),
+    )
+
+
+@router.callback_query(
+    GameCallbackData.filter(F.action == game_action.get_bunker)
+)
+@log_in_dev
+async def get_bunker_callback(
+    callback: types.CallbackQuery,
+    state: FSMContext,
+    callback_data: GameCallbackData,
+):
+    """Хендлер просмотра катастрофы."""
+    user = await User.objects.select_related("room", "room__admin").aget(
+        telegram_id=callback.from_user.id
+    )
+    keyboard = await game_keyboard()
+    game = await Game.objects.select_related(
+        "bunker_type", "room_one", "room_two", "room_three"
+    ).aget(room=user.room, is_closed=False)
+    # TODO количество мест в бункере
+    await callback.message.edit_text(
+        text=messages.BUNKER_GET_MESSAGE.format(
+            game.bunker_type, game.room_one, game.room_two, game.room_three
+        ),
+        reply_markup=keyboard.as_markup(),
     )
