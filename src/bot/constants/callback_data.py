@@ -18,6 +18,13 @@ class RoomCallbackData(BaseCallbackData, prefix="r"):
     player_id: Optional[int] = None
 
 
+class GameCallbackData(BaseCallbackData, prefix="g"):
+    """Callback_data для игры."""
+
+    pass
+
+
 CALLBACK_DATA_PREFIX = {
     RoomCallbackData.__prefix__: RoomCallbackData,
+    GameCallbackData.__prefix__: GameCallbackData,
 }

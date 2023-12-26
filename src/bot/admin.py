@@ -3,7 +3,7 @@ import csv
 from django.contrib import admin
 from django_object_actions import DjangoObjectActions
 
-from bot.models import Cart, Character, Room, User
+from bot.models import Cart, Character, Game, Room, User
 
 
 @admin.register(User)
@@ -86,3 +86,19 @@ class CharacterAdmin(admin.ModelAdmin):
         "get_main_info",
     )
     list_filter = ("room", "user")
+
+
+@admin.register(Game)
+class GameAdmin(admin.ModelAdmin):
+    """Управление моделью партий игры."""
+
+    list_display = (
+        "room",
+        "bunker_type",
+        "epidemia",
+        "room_one",
+        "room_two",
+        "room_three",
+        "is_closed",
+    )
+    list_filter = ("is_closed",)

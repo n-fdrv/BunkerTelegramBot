@@ -2,7 +2,7 @@ from random import randint
 
 from django.conf import settings
 
-from bot.models import Cart, Character, User
+from bot.models import Cart, Character, Game, Room, User
 
 
 async def get_random_cart(cart_type: str) -> Cart:
@@ -10,7 +10,25 @@ async def get_random_cart(cart_type: str) -> Cart:
     return await Cart.objects.filter(type=cart_type).order_by("?").afirst()
 
 
-async def generate_character(user: User):
+async def generate_game(room: Room):
+    """Метод генерации случайной игры."""
+    epidemia = await get_random_cart("epidemia_type")
+    bunker = await get_random_cart("bunker_type_cart")
+    room_one = await get_random_cart("room_cart")
+    room_two = await get_random_cart("room_cart")
+    room_three = await get_random_cart("room_cart")
+
+    return await Game.objects.acreate(
+        room=room,
+        epidemia=epidemia,
+        bunker_type=bunker,
+        room_one=room_one,
+        room_two=room_two,
+        room_three=room_three,
+    )
+
+
+async def generate_character(user: User, game: Game):
     """Метод генерации случайного персонажа."""
     good_health = randint(1, 100) <= settings.HEALTH_CHANCE
     no_phobia = randint(1, 100) <= settings.PHOBIA_CHANCE
@@ -51,4 +69,5 @@ async def generate_character(user: User):
         item=item,
         action_one=action_one,
         action_two=action_two,
+        game=game,
     )

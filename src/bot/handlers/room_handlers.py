@@ -4,7 +4,6 @@ from aiogram.fsm.context import FSMContext
 from bot.constants.actions import room_action
 from bot.constants.callback_data import RoomCallbackData
 from bot.constants.messages import (
-    CHARACTER_GET_MESSAGE,
     KICKED_USER_MESSAGE,
     MESSAGE_ABOUT_KICKED_PLAYER,
     NO_ROOM_MESSAGE,
@@ -18,7 +17,6 @@ from bot.constants.states import RoomState
 from bot.keyboards import inline_keyboards
 from bot.keyboards.inline_keyboards import cancel_state_keyboard
 from bot.models import User
-from bot.utils.character_generator import generate_character
 from bot.utils.room_helpers import get_room
 from bot.utils.user_helpers import get_user_url
 from core.config.logging import log_in_dev
@@ -146,33 +144,3 @@ async def player_kick_callback(
         )
     keyboard = await inline_keyboards.show_players_keyboard(room)
     await callback.message.edit_reply_markup(reply_markup=keyboard.as_markup())
-
-
-@router.callback_query(RoomCallbackData.filter(F.action == room_action.begin))
-@log_in_dev
-async def begin_game_callback(
-    callback: types.CallbackQuery,
-    state: FSMContext,
-    callback_data: RoomCallbackData,
-):
-    """Хендлер просмотра комнаты администратором."""
-    user = await User.objects.select_related("room", "room__admin").aget(
-        telegram_id=callback.from_user.id
-    )
-    character = await generate_character(user)
-    await callback.message.answer(
-        text=CHARACTER_GET_MESSAGE.format(
-            character.profession,
-            character.gender,
-            character.orientation,
-            character.age,
-            character.health,
-            character.phobia,
-            character.hobby,
-            character.personality,
-            character.information,
-            character.item,
-            character.action_one,
-            character.action_two,
-        )
-    )

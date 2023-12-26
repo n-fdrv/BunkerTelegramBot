@@ -91,6 +91,56 @@ class Cart(models.Model):
         return f"{self.name}"
 
 
+class Game(models.Model):
+    """Модель для хранения партий игры."""
+
+    room = models.ForeignKey(
+        Room,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name="Комната",
+    )
+    epidemia = models.ForeignKey(
+        Cart(type="epidemia_cart"),
+        on_delete=models.CASCADE,
+        verbose_name="Тип катастрофы",
+        related_name="epidemia",
+    )
+    bunker_type = models.ForeignKey(
+        Cart(type="bunker_type_cart"),
+        on_delete=models.CASCADE,
+        verbose_name="Тип бункера",
+        related_name="bunker_type",
+    )
+    room_one = models.ForeignKey(
+        Cart(type="room_cart"),
+        on_delete=models.CASCADE,
+        verbose_name="Комната №1",
+        related_name="room_one",
+    )
+    room_two = models.ForeignKey(
+        Cart(type="room_cart"),
+        on_delete=models.CASCADE,
+        verbose_name="Комната №2",
+        related_name="room_two",
+    )
+    room_three = models.ForeignKey(
+        Cart(type="room_cart"),
+        on_delete=models.CASCADE,
+        verbose_name="Комната №3",
+        related_name="room_three",
+    )
+    is_closed = models.BooleanField(default=False, verbose_name="Сыграна")
+
+    class Meta:
+        verbose_name = "Игра"
+        verbose_name_plural = "Игры"
+
+    def __str__(self):
+        return f"Игра №{self.pk} | Сыграна: {self.is_closed}"
+
+
 class Character(models.Model):
     """Модель для хранения сгенерированных персонажей."""
 
@@ -166,6 +216,9 @@ class Character(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Карта действий №2",
         related_name="action_two",
+    )
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, verbose_name="Игра"
     )
 
     class Meta:

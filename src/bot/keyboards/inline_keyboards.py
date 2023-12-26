@@ -1,8 +1,8 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.constants import buttons
-from bot.constants.actions import room_action
-from bot.constants.callback_data import RoomCallbackData
+from bot.constants.actions import game_action, room_action
+from bot.constants.callback_data import GameCallbackData, RoomCallbackData
 from bot.models import Room, User
 from bot.utils.back_button_builder import back_builder
 
@@ -23,7 +23,7 @@ async def room_admin_keyboard():
     keyboard = InlineKeyboardBuilder()
     keyboard.button(
         text=buttons.BEGIN_BUTTON,
-        callback_data=RoomCallbackData(action=room_action.begin),
+        callback_data=GameCallbackData(action=game_action.start),
     )
     keyboard.button(
         text=buttons.DISMISS_PLAYERS_BUTTON,
@@ -60,4 +60,23 @@ async def show_players_keyboard(room: Room):
         rows.append(2)
     keyboard = await back_builder(keyboard, room_action.admin_get)
     keyboard.adjust(*rows, 1)
+    return keyboard
+
+
+async def game_keyboard():
+    """Метод получения клавиатуры управления игрой."""
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(
+        text=buttons.EPIDEMIA_BUTTON,
+        callback_data=GameCallbackData(action=game_action.get_epidemia),
+    )
+    keyboard.button(
+        text=buttons.BUNKER_BUTTON,
+        callback_data=GameCallbackData(action=game_action.get_bunker),
+    )
+    keyboard.button(
+        text=buttons.CHARACTER_BUTTON,
+        callback_data=GameCallbackData(action=game_action.get_character),
+    )
+    keyboard.adjust(1)
     return keyboard

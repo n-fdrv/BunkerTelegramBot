@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from django.conf import settings
 from loguru import logger
 
-from bot.handlers import command_handlers, room_handlers
+from bot.handlers import command_handlers, game_handlers, room_handlers
 
 
 class AiogramApp:
@@ -29,7 +29,11 @@ class AiogramApp:
 
     def start(self) -> None:
         """Запускает бота."""
-        routes = [command_handlers.router, room_handlers.router]
+        routes = [
+            command_handlers.router,
+            room_handlers.router,
+            game_handlers.router,
+        ]
         self._download_routes(routes)
         asyncio.ensure_future(
             self.dispatcher.start_polling(self.bot, skip_updates=True)
