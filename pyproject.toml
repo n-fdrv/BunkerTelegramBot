@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "arteletelegrambot"
+version = "0.1.0"
+description = "Project for selling something."
+authors = ["Никита Федоров <n.fdrv@list.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.5"
+python-telegram-bot = {extras = ["job-queue"], version = "^20.6"}
+django-asgi-lifespan = "^0.1.0"
+uvicorn = "^0.23.2"
+python-dotenv = "^1.0.0"
+django-environ = "^0.11.2"
+loguru = "^0.7.2"
+pytest = "^7.4.2"
+pytest-django = "^4.5.2"
+pytest-asyncio = "^0.21.1"
+asyncmock = "^0.4.2"
+psycopg2-binary = "^2.9"
+pytils = "^0.4.1"
+redis = "^5.0.1"
+pillow = "^10.1.0"
+aiogram-inline-paginations = "^0.1.12"
+django-object-actions = "^4.2.0"
+apscheduler = "^3.10.4"
+pytest-cov = "^4.1.0"
+fpdf = "^1.7.2"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.4.0"
+ruff = "^0.0.290"
+black = "^23.9.1"
+isort = "^5.12.0"
+factory-boy = "^3.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

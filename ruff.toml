@@ -1,0 +1,10 @@
+ignore = ["D100", "D104", "D105", "D106", "D203", "D212"]
+select = ["E", "F", "B", "W", "I", "D", "PL"]
+extend-exclude = ["tests", "*migrations*", ".venv", "env"]
+per-file-ignores = { "settings*" = ["E501", "F405"] }
+line-length = 79
+unfixable = ["F401"]
+[isort]
+known-local-folder = ["bot", "core"]
+[mccabe]
+max-complexity = 10
