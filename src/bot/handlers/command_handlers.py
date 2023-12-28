@@ -6,17 +6,19 @@ from aiogram.types import ChatMemberUpdated
 from bot.constants.messages import (
     CREATE_ROOM_MESSAGE,
     ENTER_ROOM_SLUG_MESSAGE,
+    GAME_STARTED_MESSAGE,
     NOT_CREATED_ROOM_MESSAGE,
     PLAYER_LEFT_ROOM_MESSAGE,
     ROOM_GET_MESSAGE,
     ROOM_IS_CLOSED_MESSAGE,
     START_MESSAGE,
+    USER_CANT_ENTER_ROOM,
     YOU_LEFT_ROOM_MESSAGE,
 )
 from bot.constants.states import RoomState
 from bot.keyboards import inline_keyboards
-from bot.keyboards.inline_keyboards import cancel_state_keyboard
-from bot.models import User
+from bot.keyboards.inline_keyboards import cancel_state_keyboard, game_keyboard
+from bot.models import Game, User
 from bot.utils.room_helpers import create_room
 from bot.utils.user_helpers import get_user_url
 from core.config.logging import log_in_dev
@@ -71,6 +73,12 @@ async def show_room_command(message: types.Message, state: FSMContext):
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=message.from_user.id
     )
+    if user.room.started:
+        keyboard = await game_keyboard()
+        await message.answer(
+            text=GAME_STARTED_MESSAGE, reply_markup=keyboard.as_markup()
+        )
+        return
     players_amount = await User.objects.filter(room=user.room).acount()
     players_info = ""
     async for player in User.objects.filter(room=user.room).all():
@@ -91,6 +99,12 @@ async def show_room_command(message: types.Message, state: FSMContext):
 @log_in_dev
 async def enter_room_command(message: types.Message, state: FSMContext):
     """Хендлер перехода в состояние входа в комнату."""
+    user = await User.objects.select_related("room").aget(
+        telegram_id=message.from_user.id
+    )
+    if user.room:
+        await message.answer(text=USER_CANT_ENTER_ROOM.format(user.room.slug))
+        return
     await state.set_state(RoomState.enter_room_slug)
     keyboard = await cancel_state_keyboard()
     await message.answer(
@@ -107,7 +121,11 @@ async def leave_room_command(message: types.Message, state: FSMContext):
         telegram_id=message.from_user.id
     )
     room = user.room
-    if user.room.admin == user:
+    if room.admin == user:
+        if room.started:
+            game = await Game.objects.aget(room=room)
+            game.is_closed = True
+            await game.asave(update_fields=("is_closed",))
         async for player in User.objects.filter(room=room):
             await message.bot.send_message(
                 chat_id=player.telegram_id,

@@ -25,8 +25,8 @@ async def start_game_callback(
         telegram_id=callback.from_user.id
     )
     text, started = await start_game(user.room)
-    await callback.message.answer(text=text)
     if not started:
+        await callback.message.answer(text=text)
         return
     keyboard = await game_keyboard(callback_data=callback_data)
     async for player in User.objects.filter(room=user.room).all():
