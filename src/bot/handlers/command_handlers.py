@@ -7,10 +7,13 @@ from bot.constants.messages import (
     CREATE_ROOM_MESSAGE,
     ENTER_ROOM_SLUG_MESSAGE,
     GAME_STARTED_MESSAGE,
+    HELP_MESSAGE,
     NOT_CREATED_ROOM_MESSAGE,
     PLAYER_LEFT_ROOM_MESSAGE,
     ROOM_GET_MESSAGE,
     ROOM_IS_CLOSED_MESSAGE,
+    RULES_MESSAGE,
+    RULES_MESSAGE_2,
     START_MESSAGE,
     USER_CANT_ENTER_ROOM,
     YOU_LEFT_ROOM_MESSAGE,
@@ -39,6 +42,21 @@ async def start_handler(message: types.Message, state: FSMContext):
     user.telegram_username = message.from_user.username
     await user.asave()
     await message.answer(text=START_MESSAGE)
+
+
+@router.message(Command("help"))
+@log_in_dev
+async def help_handler(message: types.Message, state: FSMContext):
+    """Хендлер при нажатии кнопки help."""
+    await message.answer(text=HELP_MESSAGE)
+
+
+@router.message(Command("rules"))
+@log_in_dev
+async def rules_handler(message: types.Message, state: FSMContext):
+    """Хендлер при нажатии кнопки rules."""
+    await message.answer(text=RULES_MESSAGE)
+    await message.answer(text=RULES_MESSAGE_2)
 
 
 @router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=KICKED))

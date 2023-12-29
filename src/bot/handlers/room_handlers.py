@@ -8,6 +8,7 @@ from bot.constants.messages import (
     MESSAGE_ABOUT_KICKED_PLAYER,
     NO_ROOM_MESSAGE,
     ROOM_GET_MESSAGE,
+    ROOM_STARTED_MESSAGE,
     START_MESSAGE,
     USER_ENTERED_ROOM_ADMIN_MESSAGE,
     USER_ENTERED_ROOM_MESSAGE,
@@ -34,6 +35,12 @@ async def enter_room_slug_handler(message: types.Message, state: FSMContext):
         await state.set_state(RoomState.enter_room_slug)
         await message.answer(
             text=NO_ROOM_MESSAGE, reply_markup=keyboard.as_markup()
+        )
+        return
+    if room.started:
+        await state.set_state(RoomState.enter_room_slug)
+        await message.answer(
+            text=ROOM_STARTED_MESSAGE, reply_markup=keyboard.as_markup()
         )
         return
     user = await User.objects.aget(telegram_id=message.from_user.id)
