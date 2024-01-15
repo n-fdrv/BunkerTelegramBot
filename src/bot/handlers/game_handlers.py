@@ -68,8 +68,8 @@ async def get_character_callback(
         text=CHARACTER_GET_MESSAGE.format(
             character.profession,
             character.gender,
-            character.orientation,
             character.age,
+            character.orientation,
             character.health,
             character.phobia,
             character.hobby,

@@ -91,6 +91,8 @@ async def show_room_command(message: types.Message, state: FSMContext):
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=message.from_user.id
     )
+    if not user.room:
+        return
     if user.room.started:
         keyboard = await game_keyboard()
         await message.answer(

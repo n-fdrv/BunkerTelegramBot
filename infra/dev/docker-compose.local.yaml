@@ -3,7 +3,7 @@ services:
   postgres-dev-db:
     image: postgres:15
     env_file:
-      - ../../env/dev.env
+      - ../../.env
     expose:
       - "5433" # Publishes 5433 to other containers but NOT to host machine
     ports:

@@ -34,7 +34,6 @@ DEFAULT_APPS = [
 LOCAL_APPS = ['bot', 'admin_user']
 
 EXTERNAL_APPS = [
-    "ckeditor",
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + EXTERNAL_APPS
