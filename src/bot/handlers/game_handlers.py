@@ -6,7 +6,7 @@ from bot.constants.actions import game_action
 from bot.constants.callback_data import GameCallbackData
 from bot.constants.messages import CHARACTER_GET_MESSAGE
 from bot.keyboards.inline_keyboards import game_keyboard
-from bot.models import Character, Game, User
+from bot.models import Character, User
 from bot.utils.game_helpers import start_game
 from core.config.logging import log_in_dev
 
@@ -63,7 +63,7 @@ async def get_character_callback(
         "item",
         "action_one",
         "action_two",
-    ).aget(user=user, room=user.room)
+    ).aget(user=user, game__is_closed=False)
     await callback.message.edit_text(
         text=CHARACTER_GET_MESSAGE.format(
             character.profession,
@@ -92,17 +92,14 @@ async def get_epidemia_callback(
     state: FSMContext,
     callback_data: GameCallbackData,
 ):
-    """Хендлер просмотра катастрофы."""
-    user = await User.objects.select_related("room", "room__admin").aget(
+    """Хендлер просмотра информации о катастрофе."""
+    user = await User.objects.select_related("game__epidemia").aget(
         telegram_id=callback.from_user.id
     )
     keyboard = await game_keyboard(callback_data=callback_data)
-    game = await Game.objects.select_related("epidemia").aget(
-        room=user.room, is_closed=False
-    )
     await callback.message.edit_text(
         text=messages.EPIDEMIA_GET_MESSAGE.format(
-            game.epidemia, game.epidemia_time
+            user.game.epidemia, user.game.epidemia_time
         ),
         reply_markup=keyboard.as_markup(),
     )
@@ -117,23 +114,21 @@ async def get_bunker_callback(
     state: FSMContext,
     callback_data: GameCallbackData,
 ):
-    """Хендлер просмотра катастрофы."""
-    user = await User.objects.select_related("room", "room__admin").aget(
-        telegram_id=callback.from_user.id
-    )
+    """Хендлер просмотра информации о бункере."""
+    user = await User.objects.select_related(
+        "game__bunker_type",
+        "game__room_one",
+        "game__room_two",
+        "game__room_three",
+    ).aget(telegram_id=callback.from_user.id)
     keyboard = await game_keyboard(callback_data=callback_data)
-    game = await Game.objects.select_related(
-        "bunker_type", "room_one", "room_two", "room_three"
-    ).aget(room=user.room, is_closed=False)
-    players_count = await User.objects.filter(room=user.room).acount()
-    bunker_place = players_count // 2
     await callback.message.edit_text(
         text=messages.BUNKER_GET_MESSAGE.format(
-            game.bunker_type,
-            bunker_place,
-            game.room_one,
-            game.room_two,
-            game.room_three,
+            user.game.bunker_type,
+            user.game.bunker_place_amount,
+            user.game.room_one,
+            user.game.room_two,
+            user.game.room_three,
         ),
         reply_markup=keyboard.as_markup(),
     )

@@ -72,7 +72,9 @@ async def game_keyboard(callback_data: GameCallbackData = None):
     if action != game_action.get_epidemia:
         keyboard.button(
             text=buttons.EPIDEMIA_BUTTON,
-            callback_data=GameCallbackData(action=game_action.get_epidemia),
+            callback_data=GameCallbackData(
+                action=game_action.get_epidemia, id=1
+            ),
         )
     if action != game_action.get_bunker:
         keyboard.button(

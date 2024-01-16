@@ -18,5 +18,7 @@ async def start_game(room: Room):
     async for player in User.objects.select_related("room").filter(
         room=room
     ).all():
+        player.game = game
+        await player.asave(update_fields=("game",))
         await generate_character(player, game)
     return messages.GAME_STARTED_MESSAGE, True

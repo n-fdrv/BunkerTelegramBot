@@ -1,6 +1,8 @@
 from random import randint
 
+from bot.constants.messages import ROOM_GET_MESSAGE
 from bot.models import Room, User
+from bot.utils.user_helpers import get_user_url
 
 
 async def create_room(user: User):
@@ -25,3 +27,12 @@ async def get_room(room_slug):
     if is_exist:
         return await Room.objects.select_related("admin").aget(slug=room_slug)
     return None
+
+
+async def get_players_message(room: Room):
+    """Метод формирования сообщения о комнате."""
+    players_amount = await User.objects.filter(room=room).acount()
+    players_info = ""
+    async for player in User.objects.filter(room=room).all():
+        players_info += f"- {get_user_url(player)}\n"
+    return ROOM_GET_MESSAGE.format(room.slug, players_amount, players_info)

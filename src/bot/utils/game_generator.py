@@ -19,9 +19,14 @@ async def generate_game(room: Room):
     room_two = await get_random_cart("room_cart")
     room_three = await get_random_cart("room_cart")
 
+    bunker_place_amount = (
+        await User.objects.filter(room=room).acount()
+        // settings.BUNKER_PLACE_DIVIDER
+    )
+
     return await Game.objects.acreate(
-        room=room,
         epidemia=epidemia,
+        bunker_place_amount=bunker_place_amount,
         epidemia_time=epidemia_time,
         bunker_type=bunker,
         room_one=room_one,
@@ -58,7 +63,6 @@ async def generate_character(user: User, game: Game):
 
     return await Character.objects.acreate(
         user=user,
-        room=user.room,
         age=age,
         gender=gender,
         orientation=orientation,

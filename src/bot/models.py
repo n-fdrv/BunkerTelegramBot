@@ -23,58 +23,6 @@ class Room(models.Model):
         return f"{self.slug}"
 
 
-class User(models.Model):
-    """Модель для хранения пользователей."""
-
-    telegram_id = models.BigIntegerField(
-        verbose_name="Telegram User ID", unique=True
-    )
-    first_name = models.CharField(
-        max_length=255, verbose_name="Имя", null=True, blank=True
-    )
-    last_name = models.CharField(
-        max_length=255, verbose_name="Фамилия", null=True, blank=True
-    )
-    telegram_username = models.CharField(
-        max_length=255,
-        verbose_name="Ник в телеграмме",
-        null=True,
-        blank=True,
-    )
-    room = models.ForeignKey(
-        Room,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        verbose_name="Комната",
-    )
-    registration_date = models.DateField(
-        auto_now_add=True, verbose_name="Дата регистрации"
-    )
-    last_login_date = models.DateField(
-        auto_now=True, verbose_name="Заходил в последний раз"
-    )
-    is_admin = models.BooleanField(
-        default=False, verbose_name="Права администратора"
-    )
-
-    @property
-    def full_name(self):
-        """Возвращает полное имя пользователя."""
-        return f"{self.name} {self.last_name}"
-
-    class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
-
-    def __str__(self):
-        if self.first_name and self.last_name:
-            return (
-                f"{self.first_name} {self.last_name} | id: {self.telegram_id}"
-            )
-        return f"{self.telegram_username} | id: {self.telegram_id}"
-
-
 class Cart(models.Model):
     """Модель хранения карточек игры."""
 
@@ -94,13 +42,6 @@ class Cart(models.Model):
 class Game(models.Model):
     """Модель для хранения партий игры."""
 
-    room = models.ForeignKey(
-        Room,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        verbose_name="Комната",
-    )
     epidemia = models.ForeignKey(
         Cart(type="epidemia_cart"),
         on_delete=models.CASCADE,
@@ -115,6 +56,9 @@ class Game(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Тип бункера",
         related_name="bunker_type",
+    )
+    bunker_place_amount = models.IntegerField(
+        verbose_name="Количество мест в бункере"
     )
     room_one = models.ForeignKey(
         Cart(type="room_cart"),
@@ -144,14 +88,70 @@ class Game(models.Model):
         return f"Игра №{self.pk} | Сыграна: {self.is_closed}"
 
 
+class User(models.Model):
+    """Модель для хранения пользователей."""
+
+    telegram_id = models.BigIntegerField(
+        verbose_name="Telegram User ID", unique=True
+    )
+    first_name = models.CharField(
+        max_length=255, verbose_name="Имя", null=True, blank=True
+    )
+    last_name = models.CharField(
+        max_length=255, verbose_name="Фамилия", null=True, blank=True
+    )
+    telegram_username = models.CharField(
+        max_length=255,
+        verbose_name="Ник в телеграмме",
+        null=True,
+        blank=True,
+    )
+    room = models.ForeignKey(
+        Room,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name="Комната",
+    )
+    game = models.ForeignKey(
+        Game,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name="Игра",
+    )
+    registration_date = models.DateField(
+        auto_now_add=True, verbose_name="Дата регистрации"
+    )
+    last_login_date = models.DateField(
+        auto_now=True, verbose_name="Заходил в последний раз"
+    )
+    is_admin = models.BooleanField(
+        default=False, verbose_name="Права администратора"
+    )
+
+    @property
+    def full_name(self):
+        """Возвращает полное имя пользователя."""
+        return f"{self.name} {self.last_name}"
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
+
+    def __str__(self):
+        if self.first_name and self.last_name:
+            return (
+                f"{self.first_name} {self.last_name} | id: {self.telegram_id}"
+            )
+        return f"{self.telegram_username} | id: {self.telegram_id}"
+
+
 class Character(models.Model):
     """Модель для хранения сгенерированных персонажей."""
 
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name="Пользователь"
-    )
-    room = models.ForeignKey(
-        Room, on_delete=models.CASCADE, verbose_name="Комната"
     )
     age = models.IntegerField(verbose_name="Возраст")
     gender = models.ForeignKey(
@@ -231,7 +231,7 @@ class Character(models.Model):
     def __str__(self):
         return (
             f"{self.profession} {self.age} {self.gender} | "
-            f"Комната: {self.room}"
+            f"Пользователь: {self.user}"
         )
 
     def get_main_info(self):

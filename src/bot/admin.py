@@ -39,6 +39,7 @@ class UserAdmin(DjangoObjectActions, admin.ModelAdmin):
         "last_name",
         "telegram_username",
         "room",
+        "game",
         "registration_date",
         "last_login_date",
     )
@@ -81,11 +82,11 @@ class CharacterAdmin(admin.ModelAdmin):
     """Управление моделью сгенерированных персонажей."""
 
     list_display = (
-        "user",
-        "room",
         "get_main_info",
+        "game",
+        "user",
     )
-    list_filter = ("room", "user")
+    list_filter = ("game", "user", "game__is_closed")
 
 
 @admin.register(Game)
@@ -93,12 +94,14 @@ class GameAdmin(admin.ModelAdmin):
     """Управление моделью партий игры."""
 
     list_display = (
-        "room",
+        "pk",
         "bunker_type",
+        "bunker_place_amount",
         "epidemia",
         "room_one",
         "room_two",
         "room_three",
         "is_closed",
     )
+    list_display_links = ("pk", "bunker_type")
     list_filter = ("is_closed",)

@@ -51,6 +51,10 @@ class AiogramApp:
                     BotCommand(
                         command="leave_room", description="Выйти из комнаты"
                     ),
+                    BotCommand(
+                        command="reload_game",
+                        description="Перезапустить игру в комнате",
+                    ),
                     BotCommand(command="help", description="Помощь"),
                     BotCommand(command="rules", description="Правила Игры"),
                 ]

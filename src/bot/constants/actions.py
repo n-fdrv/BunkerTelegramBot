@@ -40,6 +40,7 @@ class GameAction(Action):
     get_epidemia = "g-ge"
     get_bunker = "g-gb"
     get_character = "g-gc"
+    new_game = "g-ng"
 
 
 room_action = RoomAction("r")

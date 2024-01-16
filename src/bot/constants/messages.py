@@ -110,3 +110,6 @@ ROOM_GET_MESSAGE = "Комната №{}\n" "Количество игроков
 YOU_LEFT_ROOM_MESSAGE = "Ты успешно вышел из комнаты №{}"
 KICKED_USER_MESSAGE = "Тебя выгнали из комнаты"
 MESSAGE_ABOUT_KICKED_PLAYER = "Администратор комнаты выгнал игрока - {}"
+NOT_IN_ROOM_MESSAGE = "Вы не находитесь в комнате"
+NO_GAME_MESSAGE = "Вы не находитесь в игре"
+NOT_ADMIN_MESSAGE = "Вы не администратор комнаты"

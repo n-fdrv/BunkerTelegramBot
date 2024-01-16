@@ -7,7 +7,6 @@ from bot.constants.messages import (
     KICKED_USER_MESSAGE,
     MESSAGE_ABOUT_KICKED_PLAYER,
     NO_ROOM_MESSAGE,
-    ROOM_GET_MESSAGE,
     ROOM_STARTED_MESSAGE,
     START_MESSAGE,
     USER_ENTERED_ROOM_ADMIN_MESSAGE,
@@ -18,7 +17,7 @@ from bot.constants.states import RoomState
 from bot.keyboards import inline_keyboards
 from bot.keyboards.inline_keyboards import cancel_state_keyboard
 from bot.models import User
-from bot.utils.room_helpers import get_room
+from bot.utils.room_helpers import get_players_message, get_room
 from bot.utils.user_helpers import get_user_url
 from core.config.logging import log_in_dev
 
@@ -111,13 +110,7 @@ async def show_room_admin_callback(
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=callback.from_user.id
     )
-    players_amount = await User.objects.filter(room=user.room).acount()
-    players_info = ""
-    async for player in User.objects.filter(room=user.room).all():
-        players_info += f"- {get_user_url(player)}\n"
-    text = ROOM_GET_MESSAGE.format(
-        user.room.slug, players_amount, players_info
-    )
+    text = await get_players_message(user.room)
     keyboard = await inline_keyboards.room_admin_keyboard()
     await callback.message.edit_text(
         text=text, reply_markup=keyboard.as_markup(), parse_mode="Markdown"
