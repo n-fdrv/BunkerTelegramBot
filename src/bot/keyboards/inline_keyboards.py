@@ -63,7 +63,7 @@ async def show_players_keyboard(room: Room):
     return keyboard
 
 
-async def game_keyboard(callback_data: GameCallbackData = None):
+async def game_keyboard(user: User, callback_data: GameCallbackData = None):
     """Метод получения клавиатуры управления игрой."""
     keyboard = InlineKeyboardBuilder()
     action = None
@@ -86,5 +86,26 @@ async def game_keyboard(callback_data: GameCallbackData = None):
             text=buttons.CHARACTER_BUTTON,
             callback_data=GameCallbackData(action=game_action.get_character),
         )
+    if user.room.admin == user:
+        keyboard.button(
+            text=buttons.ROOM_SETTINGS_BUTTON,
+            callback_data=GameCallbackData(action=game_action.game_settings),
+        )
+    keyboard.adjust(1)
+    return keyboard
+
+
+async def game_settings_keyboard():
+    """Метод формирования клавиатуры настроек игры."""
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(
+        text=buttons.RELOAD_GAME_BUTTON,
+        callback_data=GameCallbackData(action=game_action.reload_game),
+    )
+    keyboard.button(
+        text=buttons.CLOSE_GAME_BUTTON,
+        callback_data=GameCallbackData(action=game_action.close_game),
+    )
+    keyboard = await back_builder(keyboard, game_action.get_epidemia)
     keyboard.adjust(1)
     return keyboard

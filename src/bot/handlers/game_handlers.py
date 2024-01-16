@@ -5,9 +5,12 @@ from bot.constants import messages
 from bot.constants.actions import game_action
 from bot.constants.callback_data import GameCallbackData
 from bot.constants.messages import CHARACTER_GET_MESSAGE
-from bot.keyboards.inline_keyboards import game_keyboard
+from bot.keyboards.inline_keyboards import (
+    game_keyboard,
+    game_settings_keyboard,
+)
 from bot.models import Character, User
-from bot.utils.game_helpers import start_game
+from bot.utils.game_helpers import get_players_message, start_game
 from core.config.logging import log_in_dev
 
 router = Router()
@@ -21,15 +24,18 @@ async def start_game_callback(
     callback_data: GameCallbackData,
 ):
     """Хендлер начала игры."""
-    user = await User.objects.select_related("room").aget(
+    user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=callback.from_user.id
     )
     text, started = await start_game(user.room)
     if not started:
         await callback.message.answer(text=text)
         return
-    keyboard = await game_keyboard(callback_data=callback_data)
-    async for player in User.objects.filter(room=user.room).all():
+    await callback.message.delete()
+    async for player in User.objects.select_related("room__admin").filter(
+        room=user.room
+    ).all():
+        keyboard = await game_keyboard(player, callback_data=callback_data)
         await callback.message.bot.send_message(
             chat_id=player.telegram_id,
             text=messages.GAME_STARTED_MESSAGE,
@@ -50,7 +56,7 @@ async def get_character_callback(
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=callback.from_user.id
     )
-    keyboard = await game_keyboard(callback_data=callback_data)
+    keyboard = await game_keyboard(user, callback_data=callback_data)
     character = await Character.objects.select_related(
         "profession",
         "gender",
@@ -93,10 +99,10 @@ async def get_epidemia_callback(
     callback_data: GameCallbackData,
 ):
     """Хендлер просмотра информации о катастрофе."""
-    user = await User.objects.select_related("game__epidemia").aget(
-        telegram_id=callback.from_user.id
-    )
-    keyboard = await game_keyboard(callback_data=callback_data)
+    user = await User.objects.select_related(
+        "game__epidemia", "room__admin"
+    ).aget(telegram_id=callback.from_user.id)
+    keyboard = await game_keyboard(user, callback_data=callback_data)
     await callback.message.edit_text(
         text=messages.EPIDEMIA_GET_MESSAGE.format(
             user.game.epidemia, user.game.epidemia_time
@@ -120,8 +126,9 @@ async def get_bunker_callback(
         "game__room_one",
         "game__room_two",
         "game__room_three",
+        "room__admin",
     ).aget(telegram_id=callback.from_user.id)
-    keyboard = await game_keyboard(callback_data=callback_data)
+    keyboard = await game_keyboard(user, callback_data=callback_data)
     await callback.message.edit_text(
         text=messages.BUNKER_GET_MESSAGE.format(
             user.game.bunker_type,
@@ -132,3 +139,82 @@ async def get_bunker_callback(
         ),
         reply_markup=keyboard.as_markup(),
     )
+
+
+@router.callback_query(
+    GameCallbackData.filter(F.action == game_action.game_settings)
+)
+@log_in_dev
+async def get_game_settings_handler(
+    callback: types.CallbackQuery,
+    state: FSMContext,
+    callback_data: GameCallbackData,
+):
+    """Хендлер настроек игры."""
+    user = await User.objects.select_related("game").aget(
+        telegram_id=callback.from_user.id
+    )
+    text = await get_players_message(user.game)
+    keyboard = await game_settings_keyboard()
+    await callback.message.edit_text(
+        text=text,
+        reply_markup=keyboard.as_markup(),
+        parse_mode="Markdown",
+    )
+
+
+@router.callback_query(
+    GameCallbackData.filter(F.action == game_action.reload_game)
+)
+@log_in_dev
+async def reload_game_handler(
+    callback: types.CallbackQuery,
+    state: FSMContext,
+    callback_data: GameCallbackData,
+):
+    """Хендлер перезапуска игры."""
+    user = await User.objects.select_related(
+        "room", "room__admin", "game"
+    ).aget(telegram_id=callback.from_user.id)
+    user.game.is_closed = True
+    await user.game.asave(update_fields=("is_closed",))
+    text, started = await start_game(user.room)
+    if not started:
+        await callback.answer(text=text)
+        return
+    await callback.message.delete()
+    async for player in User.objects.select_related("room__admin").filter(
+        room=user.room
+    ).all():
+        keyboard = await game_keyboard(player)
+        await callback.bot.send_message(
+            chat_id=player.telegram_id,
+            text=messages.GAME_STARTED_MESSAGE,
+            reply_markup=keyboard.as_markup(),
+        )
+
+
+@router.callback_query(
+    GameCallbackData.filter(F.action == game_action.close_game)
+)
+@log_in_dev
+async def close_game_handler(
+    callback: types.CallbackQuery,
+    state: FSMContext,
+    callback_data: GameCallbackData,
+):
+    """Хендлер закрытия игры и перехода в лобби."""
+    user = await User.objects.select_related(
+        "room", "room__admin", "game"
+    ).aget(telegram_id=callback.from_user.id)
+    user.game.is_closed = True
+    user.room.started = False
+    await user.room.asave(update_fields=("started",))
+    await user.game.asave(update_fields=("is_closed",))
+    await callback.message.delete()
+    await User.objects.filter(game=user.game).aupdate(game=None)
+    async for player in User.objects.filter(room=user.room).all():
+        await callback.bot.send_message(
+            chat_id=player.telegram_id,
+            text=messages.GAME_CLOSED_MESSAGE,
+        )

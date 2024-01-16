@@ -8,8 +8,6 @@ from bot.constants.messages import (
     ENTER_ROOM_SLUG_MESSAGE,
     GAME_STARTED_MESSAGE,
     HELP_MESSAGE,
-    NO_GAME_MESSAGE,
-    NOT_ADMIN_MESSAGE,
     NOT_CREATED_ROOM_MESSAGE,
     NOT_IN_ROOM_MESSAGE,
     PLAYER_LEFT_ROOM_MESSAGE,
@@ -24,7 +22,6 @@ from bot.constants.states import RoomState
 from bot.keyboards import inline_keyboards
 from bot.keyboards.inline_keyboards import cancel_state_keyboard, game_keyboard
 from bot.models import Character, Game, User
-from bot.utils.game_helpers import start_game
 from bot.utils.room_helpers import create_room, get_players_message
 from bot.utils.user_helpers import get_user_url
 from core.config.logging import log_in_dev
@@ -95,7 +92,7 @@ async def show_room_command(message: types.Message, state: FSMContext):
         "room", "room__admin", "game"
     ).aget(telegram_id=message.from_user.id)
     if user.game:
-        keyboard = await game_keyboard()
+        keyboard = await game_keyboard(user)
         await message.answer(
             text=GAME_STARTED_MESSAGE, reply_markup=keyboard.as_markup()
         )
@@ -164,33 +161,4 @@ async def leave_room_command(message: types.Message, state: FSMContext):
             chat_id=player.telegram_id,
             text=PLAYER_LEFT_ROOM_MESSAGE.format(get_user_url(user)),
             parse_mode="Markdown",
-        )
-
-
-@router.message(Command("reload_game"))
-@log_in_dev
-async def reload_game_command(message: types.Message, state: FSMContext):
-    """Хендлер Перезапуска игры."""
-    await state.clear()
-    user = await User.objects.select_related(
-        "room", "room__admin", "game"
-    ).aget(telegram_id=message.from_user.id)
-    if not user.game:
-        await message.answer(text=NO_GAME_MESSAGE)
-        return
-    if user.room.admin.telegram_id != message.from_user.id:
-        await message.answer(text=NOT_ADMIN_MESSAGE)
-        return
-    user.game.is_closed = True
-    await user.game.asave(update_fields=("is_closed",))
-    text, started = await start_game(user.room)
-    if not started:
-        await message.answer(text=text)
-        return
-    keyboard = await game_keyboard()
-    async for player in User.objects.filter(room=user.room).all():
-        await message.bot.send_message(
-            chat_id=player.telegram_id,
-            text=GAME_STARTED_MESSAGE,
-            reply_markup=keyboard.as_markup(),
         )
