@@ -17,7 +17,7 @@ from bot.constants.states import RoomState
 from bot.keyboards import inline_keyboards
 from bot.keyboards.inline_keyboards import cancel_state_keyboard
 from bot.models import User
-from bot.utils.room_helpers import get_players_message, get_room
+from bot.utils.room_helpers import get_players_in_room_message, get_room
 from bot.utils.user_helpers import get_user_url
 from core.config.logging import log_in_dev
 
@@ -110,7 +110,7 @@ async def show_room_admin_callback(
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=callback.from_user.id
     )
-    text = await get_players_message(user.room)
+    text = await get_players_in_room_message(user.room)
     keyboard = await inline_keyboards.room_admin_keyboard()
     await callback.message.edit_text(
         text=text, reply_markup=keyboard.as_markup(), parse_mode="Markdown"

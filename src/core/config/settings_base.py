@@ -33,8 +33,7 @@ DEFAULT_APPS = [
 
 LOCAL_APPS = ['bot', 'admin_user']
 
-EXTERNAL_APPS = [
-]
+EXTERNAL_APPS = []
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + EXTERNAL_APPS
 
@@ -102,11 +101,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-REDIS = {
-    'host': env.str('REDIS_HOST', default='localhost'),
-    'port': env.str('REDIS_PORT', default='6379')
-}
-
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
@@ -114,23 +108,15 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 TELEGRAM_TOKEN = env.str('TELEGRAM_TOKEN', default=DEFAULT)
-USE_REDIS_PERSISTENCE = env.bool('REDIS', default=False)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-WEBHOOK_MODE = False
-WEBHOOK_URL = ""
-WEBHOOK_SECRET_KEY = ""
-
-PERSISTENCE_DIR = BASE_DIR / "persistence_data"
-PERSISTENCE_PATH = PERSISTENCE_DIR / "persistence_file"
-
-Path.mkdir(PERSISTENCE_DIR, exist_ok=True)
-
 
 BUNKER_PLACE_DIVIDER = 2
 HEALTH_CHANCE = 30
 PHOBIA_CHANCE = 10
 ORIENTATION_CHANCE = 50
+YOUNG_AGE_CHANCE = 50
+
 MIN_AGE_VALUE = 18
+AVERAGE_AGE_VALUE = 40
 MAX_AGE_VALUE = 100

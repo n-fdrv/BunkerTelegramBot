@@ -29,8 +29,8 @@ async def get_room(room_slug):
     return None
 
 
-async def get_players_message(room: Room):
-    """Метод формирования сообщения о комнате."""
+async def get_players_in_room_message(room: Room):
+    """Метод формирования сообщения об игроках в комнате."""
     players_amount = await User.objects.filter(room=room).acount()
     players_info = ""
     async for player in User.objects.filter(room=room).all():

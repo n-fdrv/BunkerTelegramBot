@@ -25,8 +25,8 @@ async def start_game(room: Room):
     return messages.GAME_STARTED_MESSAGE, True
 
 
-async def get_players_message(game: Game):
-    """Метод формирования сообщения об игре."""
+async def get_players_in_game_message(game: Game):
+    """Метод формирования сообщения об игроках в игре."""
     players_amount = await User.objects.filter(game=game).acount()
     players_info = ""
     async for player in User.objects.filter(game=game).all():

@@ -23,7 +23,7 @@ from bot.constants.states import RoomState
 from bot.keyboards import inline_keyboards
 from bot.keyboards.inline_keyboards import cancel_state_keyboard, game_keyboard
 from bot.models import Character, Game, User
-from bot.utils.room_helpers import create_room, get_players_message
+from bot.utils.room_helpers import create_room, get_players_in_room_message
 from bot.utils.user_helpers import get_user_url
 from core.config.logging import log_in_dev
 
@@ -48,14 +48,14 @@ async def start_handler(message: types.Message, state: FSMContext):
 @router.message(Command(commands.HELP_COMMAND))
 @log_in_dev
 async def help_handler(message: types.Message, state: FSMContext):
-    """Хендлер при нажатии кнопки help."""
+    """Хендлер команды help."""
     await message.answer(text=HELP_MESSAGE)
 
 
 @router.message(Command(commands.RULES_COMMAND))
 @log_in_dev
 async def rules_handler(message: types.Message, state: FSMContext):
-    """Хендлер при нажатии кнопки rules."""
+    """Хендлер команды rules."""
     await message.answer(text=RULES_MESSAGE)
     await message.answer(text=RULES_MESSAGE_2)
 
@@ -72,7 +72,7 @@ async def block_handler(event: ChatMemberUpdated, state: FSMContext):
 @router.message(Command(commands.NEW_GAME_ROOM_COMMAND))
 @log_in_dev
 async def create_room_handler(message: types.Message, state: FSMContext):
-    """Хендлер при нажатии кнопки start."""
+    """Хендлер создания лобби."""
     await state.clear()
     user = await User.objects.select_related("room").aget(
         telegram_id=message.from_user.id
@@ -101,7 +101,7 @@ async def show_room_command(message: types.Message, state: FSMContext):
     if not user.room:
         await message.answer(text=NOT_IN_ROOM_MESSAGE)
         return
-    text = await get_players_message(user.room)
+    text = await get_players_in_room_message(user.room)
     if user.room.admin == user:
         keyboard = await inline_keyboards.room_admin_keyboard()
         await message.answer(

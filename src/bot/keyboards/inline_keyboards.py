@@ -36,7 +36,7 @@ async def room_admin_keyboard():
 
 
 async def show_players_keyboard(room: Room):
-    """Метод формирования клавиатуры администратора комнаты."""
+    """Метод формирования клавиатуры просмотра игроков в лобби."""
     keyboard = InlineKeyboardBuilder()
     rows = []
     async for player in User.objects.filter(room=room).all():

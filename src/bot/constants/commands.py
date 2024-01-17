@@ -5,6 +5,7 @@ MY_GAME_ROOM_COMMAND = "my"
 LEAVE_GAME_ROOM_COMMAND = "leave"
 RULES_COMMAND = "rules"
 HELP_COMMAND = "help"
+
 START_DESCRIPTION = "Запустить бота"
 NEW_GAME_ROOM_DESCRIPTION = "Создать игровую комнату"
 ENTER_GAME_ROOM_DESCRIPTION = "Войти в игровую комнату"

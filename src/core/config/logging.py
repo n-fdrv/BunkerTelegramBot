@@ -56,23 +56,3 @@ def log_in_dev(func: object) -> object:
             raise e
 
     return wrapper
-
-
-def log_schedulers(func):
-    """Декоратор для логирования шедулеров."""
-
-    async def wrapper(*args, **kwargs):
-        try:
-            result = await func(*args, **kwargs)
-            text = f"Scheduler: {func.__name__} | " f"Data: {args, kwargs}"
-            logger.info(text)
-            return result
-        except Exception as e:
-            logger.exception(
-                f"Scheduler: {func.__name__} | "
-                f"Data: {[*kwargs]} | "
-                f"Exception: {e}"
-            )
-            raise e
-
-    return wrapper

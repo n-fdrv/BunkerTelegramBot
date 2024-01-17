@@ -10,7 +10,7 @@ from bot.keyboards.inline_keyboards import (
     game_settings_keyboard,
 )
 from bot.models import Character, User
-from bot.utils.game_helpers import get_players_message, start_game
+from bot.utils.game_helpers import get_players_in_game_message, start_game
 from core.config.logging import log_in_dev
 
 router = Router()
@@ -154,7 +154,7 @@ async def get_game_settings_handler(
     user = await User.objects.select_related("game").aget(
         telegram_id=callback.from_user.id
     )
-    text = await get_players_message(user.game)
+    text = await get_players_in_game_message(user.game)
     keyboard = await game_settings_keyboard()
     await callback.message.edit_text(
         text=text,

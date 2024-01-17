@@ -10,7 +10,7 @@ async def get_random_cart(cart_type: str) -> Cart:
     return await Cart.objects.filter(type=cart_type).order_by("?").afirst()
 
 
-async def generate_game(room: Room):
+async def generate_game(room: Room) -> Game:
     """Метод генерации случайной игры."""
     epidemia = await get_random_cart("epidemia_type")
     epidemia_time = randint(1, 10)
@@ -35,12 +35,17 @@ async def generate_game(room: Room):
     )
 
 
-async def generate_character(user: User, game: Game):
+async def generate_character(user: User, game: Game) -> Character:
     """Метод генерации случайного персонажа."""
     good_health = randint(1, 100) <= settings.HEALTH_CHANCE
     no_phobia = randint(1, 100) <= settings.PHOBIA_CHANCE
-    getero_orientation = randint(1, 100) < settings.ORIENTATION_CHANCE
-    age = randint(settings.MIN_AGE_VALUE, settings.MAX_AGE_VALUE)
+    getero_orientation = randint(1, 100) <= settings.ORIENTATION_CHANCE
+    young_age = randint(1, 100) <= settings.YOUNG_AGE_CHANCE
+
+    age = randint(settings.AVERAGE_AGE_VALUE, settings.MAX_AGE_VALUE)
+
+    if young_age:
+        age = randint(settings.MIN_AGE_VALUE, settings.AVERAGE_AGE_VALUE)
 
     gender = await get_random_cart("gender_cart")
     orientation = await get_random_cart("orientation_cart")
@@ -55,7 +60,7 @@ async def generate_character(user: User, game: Game):
     action_two = await get_random_cart("action_cart")
 
     if good_health:
-        health = await Cart.objects.aget(name="Полностью здоров.")
+        health = await Cart.objects.aget(name="Полностью Здоров.")
     if no_phobia:
         phobia = await Cart.objects.aget(name="Отсутствует")
     if getero_orientation:

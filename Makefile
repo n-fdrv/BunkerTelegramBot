@@ -13,14 +13,6 @@ help:  # Вызвать help
 	@echo -e "$(COLOR_GREEN)Makefile help:"
 	@grep -E '^[a-zA-Z0-9 -]+:.*#'  Makefile | sort | while read -r l; do printf "$(COLOR_GREEN)-$$(echo $$l | cut -f 1 -d':'):$(COLOR_WHITE)$$(echo $$l | cut -f 2- -d'#')\n"; done
 
-
-.PHONY: runbot
-runbot: # Запуск Telegram Bot с Uvicorn
-	@echo -e "$(COLOR_YELLOW)Starting bot...$(COLOR_RESET)"
-	@cd src && poetry run uvicorn core.asgi:application --reload && cd .. && \
-	echo -e "$(COLOR_GREEN)Bot stopped$(COLOR_RESET)"
-
-
 start-db: # Запуск контейнера Postgres
 	docker-compose -f infra/dev/docker-compose.local.yaml up -d; \
 	if [ $$? -ne 0 ]; \
@@ -52,6 +44,8 @@ collectstatic: # Собрать статику Django
 createsuperuser: # Создать супер пользователя
 	poetry run python src/manage.py createsuperuser --noinput
 
+upload-data: # Создать супер пользователя
+	cd src && poetry run python manage.py upload_carts && cd ..
 
 run-app: # Запуск Django и Telegram бота
 	@echo -e "$(COLOR_YELLOW)Starting bot...$(COLOR_RESET)"
@@ -59,7 +53,4 @@ run-app: # Запуск Django и Telegram бота
 	echo -e "$(COLOR_GREEN)Bot stopped$(COLOR_RESET)"
 
 bot-init: # Базовая команда для запуска БД, миграций, бота и джанго
-	make clear-db start-db migrate collectstatic createsuperuser run-app
-
-create-product: # Команда для создания тестового продукта
-	poetry run python src/manage.py create_product --amount ${amount}
+	make clear-db start-db migrate collectstatic createsuperuser upload-data run-app
