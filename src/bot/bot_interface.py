@@ -6,6 +6,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from django.conf import settings
 from loguru import logger
 
+from bot.constants import commands
 from bot.handlers import command_handlers, game_handlers, room_handlers
 
 
@@ -39,20 +40,34 @@ class AiogramApp:
         asyncio.ensure_future(
             self.bot.set_my_commands(
                 [
-                    BotCommand(command="start", description="Запустить бота"),
                     BotCommand(
-                        command="new_room",
-                        description="Создать комнату для игры",
+                        command=commands.START_COMMAND,
+                        description=commands.START_DESCRIPTION,
                     ),
                     BotCommand(
-                        command="enter_room", description="Зайти в комнату"
+                        command=commands.NEW_GAME_ROOM_COMMAND,
+                        description=commands.NEW_GAME_ROOM_DESCRIPTION,
                     ),
-                    BotCommand(command="my_room", description="Моя комната"),
                     BotCommand(
-                        command="leave_room", description="Выйти из комнаты"
+                        command=commands.ENTER_GAME_ROOM_COMMAND,
+                        description=commands.ENTER_GAME_ROOM_DESCRIPTION,
                     ),
-                    BotCommand(command="help", description="Помощь"),
-                    BotCommand(command="rules", description="Правила Игры"),
+                    BotCommand(
+                        command=commands.MY_GAME_ROOM_COMMAND,
+                        description=commands.MY_GAME_ROOM_DESCRIPTION,
+                    ),
+                    BotCommand(
+                        command=commands.LEAVE_GAME_ROOM_COMMAND,
+                        description=commands.LEAVE_GAME_ROOM_DESCRIPTION,
+                    ),
+                    BotCommand(
+                        command=commands.HELP_COMMAND,
+                        description=commands.HELP_DESCRIPTION,
+                    ),
+                    BotCommand(
+                        command=commands.RULES_COMMAND,
+                        description=commands.RULES_DESCRIPTION,
+                    ),
                 ]
             )
         )

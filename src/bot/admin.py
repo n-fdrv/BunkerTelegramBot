@@ -45,10 +45,10 @@ class UserAdmin(DjangoObjectActions, admin.ModelAdmin):
     )
     list_filter = ("room",)
     search_fields = ("telegram_id", "telegram_username")
-    # readonly_fields = (
-    #     "telegram_id",
-    #     "room",
-    # )
+    readonly_fields = (
+        "telegram_id",
+        "room",
+    )
 
 
 @admin.register(Room)

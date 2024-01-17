@@ -3,6 +3,7 @@ from aiogram.filters import KICKED, ChatMemberUpdatedFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ChatMemberUpdated
 
+from bot.constants import commands
 from bot.constants.messages import (
     CREATE_ROOM_MESSAGE,
     ENTER_ROOM_SLUG_MESSAGE,
@@ -29,7 +30,7 @@ from core.config.logging import log_in_dev
 router = Router()
 
 
-@router.message(Command("start"))
+@router.message(Command(commands.START_COMMAND))
 @log_in_dev
 async def start_handler(message: types.Message, state: FSMContext):
     """Хендлер при нажатии кнопки start."""
@@ -44,14 +45,14 @@ async def start_handler(message: types.Message, state: FSMContext):
     await message.answer(text=START_MESSAGE)
 
 
-@router.message(Command("help"))
+@router.message(Command(commands.HELP_COMMAND))
 @log_in_dev
 async def help_handler(message: types.Message, state: FSMContext):
     """Хендлер при нажатии кнопки help."""
     await message.answer(text=HELP_MESSAGE)
 
 
-@router.message(Command("rules"))
+@router.message(Command(commands.RULES_COMMAND))
 @log_in_dev
 async def rules_handler(message: types.Message, state: FSMContext):
     """Хендлер при нажатии кнопки rules."""
@@ -68,7 +69,7 @@ async def block_handler(event: ChatMemberUpdated, state: FSMContext):
     await user.adelete()
 
 
-@router.message(Command("new_room"))
+@router.message(Command(commands.NEW_GAME_ROOM_COMMAND))
 @log_in_dev
 async def create_room_handler(message: types.Message, state: FSMContext):
     """Хендлер при нажатии кнопки start."""
@@ -83,7 +84,7 @@ async def create_room_handler(message: types.Message, state: FSMContext):
     await message.answer(text=CREATE_ROOM_MESSAGE.format(room.slug))
 
 
-@router.message(Command("my_room"))
+@router.message(Command(commands.MY_GAME_ROOM_COMMAND))
 @log_in_dev
 async def show_room_command(message: types.Message, state: FSMContext):
     """Хендлер просмотра комнаты."""
@@ -110,7 +111,7 @@ async def show_room_command(message: types.Message, state: FSMContext):
     await message.answer(text=text, parse_mode="Markdown")
 
 
-@router.message(Command("enter_room"))
+@router.message(Command(commands.ENTER_GAME_ROOM_COMMAND))
 @log_in_dev
 async def enter_room_command(message: types.Message, state: FSMContext):
     """Хендлер перехода в состояние входа в комнату."""
@@ -127,7 +128,7 @@ async def enter_room_command(message: types.Message, state: FSMContext):
     )
 
 
-@router.message(Command("leave_room"))
+@router.message(Command(commands.LEAVE_GAME_ROOM_COMMAND))
 @log_in_dev
 async def leave_room_command(message: types.Message, state: FSMContext):
     """Хендлер выхода/закрытия комнаты в которой находится пользователь."""
