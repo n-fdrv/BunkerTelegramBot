@@ -2,12 +2,24 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
+from aiogram.webhook.aiohttp_server import (
+    SimpleRequestHandler,
+    setup_application,
+)
+from aiohttp import web
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from django.conf import settings
 from loguru import logger
 
 from bot.constants import commands
 from bot.handlers import command_handlers, game_handlers, room_handlers
+
+
+async def on_startup(bot: Bot):
+    """Метод настройки Webhook."""
+    logger.info("Bot has been started")
+    await bot.set_webhook(settings.WEBHOOK_URL, drop_pending_updates=True)
+    logger.info("Webhook has been set up")
 
 
 class AiogramApp:
@@ -71,10 +83,26 @@ class AiogramApp:
                 ]
             )
         )
-        asyncio.ensure_future(
-            self.dispatcher.start_polling(self.bot, skip_updates=True)
-        )
-
+        if settings.WEBHOOK_ENABLED:
+            self.dispatcher.startup.register(on_startup)
+            app = web.Application()
+            webhook_requests_handler = SimpleRequestHandler(
+                dispatcher=self.dispatcher,
+                bot=self.bot,
+            )
+            webhook_requests_handler.register(app, path=settings.WEBHOOK_PATH)
+            setup_application(app, self.dispatcher, bot=self.bot)
+            asyncio.ensure_future(
+                web._run_app(
+                    app,
+                    host=settings.WEB_SERVER_HOST,
+                    port=settings.WEB_SERVER_PORT,
+                )
+            )
+        else:
+            asyncio.ensure_future(
+                self.dispatcher.start_polling(self.bot, skip_updates=True)
+            )
         self.scheduler.start()
 
     def stop(self) -> None:

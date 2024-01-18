@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 
-ADMIN_HEADER = "Администрирование PacanBotTelegram"
+ADMIN_HEADER = "Администрирование BunkerTelegramBot"
 ADMIN_TITLE = "Панель администратора бота"
 
 AdminUser = get_user_model()

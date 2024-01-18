@@ -111,6 +111,12 @@ TELEGRAM_TOKEN = env.str('TELEGRAM_TOKEN', default=DEFAULT)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+WEBHOOK_ENABLED = env.str('WEBHOOK_ENABLED', default=False)
+WEB_SERVER_HOST = env.str('WEB_SERVER_HOST', default='0.0.0.0')
+WEB_SERVER_PORT = env.str('WEB_SERVER_PORT', default=8443)
+WEBHOOK_PATH = env.str('WEBHOOK_PATH', default='/webhook')
+WEBHOOK_URL = env.str('WEBHOOK_URL', default='localhost')
+
 BUNKER_PLACE_DIVIDER = 2
 HEALTH_CHANCE = 30
 PHOBIA_CHANCE = 10
