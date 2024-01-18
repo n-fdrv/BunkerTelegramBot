@@ -44,7 +44,7 @@ collectstatic: # Собрать статику Django
 createsuperuser: # Создать супер пользователя
 	poetry run python src/manage.py createsuperuser --noinput
 
-upload-data: # Создать супер пользователя
+upload-data: # Загрузить данные
 	cd src && poetry run python manage.py upload_carts && cd ..
 
 run-app: # Запуск Django и Telegram бота
@@ -54,3 +54,6 @@ run-app: # Запуск Django и Telegram бота
 
 bot-init: # Базовая команда для запуска БД, миграций, бота и джанго
 	make clear-db start-db migrate collectstatic createsuperuser upload-data run-app
+
+bot-existing-bd: # запуск бота и контейнера PostgreSQL с существующими данными в БД:
+	make start-db run-app
