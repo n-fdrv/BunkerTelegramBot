@@ -1,6 +1,8 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.types import BotCommand
 from aiogram.webhook.aiohttp_server import (
     SimpleRequestHandler,
@@ -10,6 +12,7 @@ from aiohttp import web
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from django.conf import settings
 from loguru import logger
+from redis.asyncio.client import Redis
 
 from bot.constants import commands
 from bot.handlers import command_handlers, game_handlers, room_handlers
@@ -83,6 +86,10 @@ class AiogramApp:
                 ]
             )
         )
+        storage = MemoryStorage()
+        if settings.REDIS:
+            redis = Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
+            storage = RedisStorage(redis)
         if settings.WEBHOOK_ENABLED:
             self.dispatcher.startup.register(on_startup)
             app = web.Application()
@@ -91,7 +98,9 @@ class AiogramApp:
                 bot=self.bot,
             )
             webhook_requests_handler.register(app, path=settings.WEBHOOK_PATH)
-            setup_application(app, self.dispatcher, bot=self.bot)
+            setup_application(
+                app, self.dispatcher, bot=self.bot, storage=storage
+            )
             asyncio.ensure_future(
                 web._run_app(
                     app,
@@ -101,7 +110,9 @@ class AiogramApp:
             )
         else:
             asyncio.ensure_future(
-                self.dispatcher.start_polling(self.bot, skip_updates=True)
+                self.dispatcher.start_polling(
+                    self.bot, skip_updates=True, storage=storage
+                )
             )
         self.scheduler.start()
 

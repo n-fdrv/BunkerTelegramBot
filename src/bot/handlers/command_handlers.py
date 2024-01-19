@@ -22,8 +22,9 @@ from bot.constants.messages import (
 from bot.constants.states import RoomState
 from bot.keyboards import inline_keyboards
 from bot.keyboards.inline_keyboards import cancel_state_keyboard, game_keyboard
-from bot.models import Character, Game, User
+from bot.models import User
 from bot.utils.room_helpers import create_room, get_players_in_room_message
+from bot.utils.state_helpers import get_user
 from bot.utils.user_helpers import get_user_url
 from core.config.logging import log_in_dev
 
@@ -65,7 +66,7 @@ async def rules_handler(message: types.Message, state: FSMContext):
 async def block_handler(event: ChatMemberUpdated, state: FSMContext):
     """Хендлер при блокировке бота."""
     await state.clear()
-    user = await User.objects.aget(telegram_id=event.from_user.id)
+    user = await get_user(event.from_user.id)
     await user.adelete()
 
 
@@ -74,9 +75,7 @@ async def block_handler(event: ChatMemberUpdated, state: FSMContext):
 async def create_room_handler(message: types.Message, state: FSMContext):
     """Хендлер создания лобби."""
     await state.clear()
-    user = await User.objects.select_related("room").aget(
-        telegram_id=message.from_user.id
-    )
+    user = await get_user(message.from_user.id)
     room, created = await create_room(user)
     if not created:
         await message.answer(text=NOT_CREATED_ROOM_MESSAGE.format(room.slug))
@@ -89,9 +88,7 @@ async def create_room_handler(message: types.Message, state: FSMContext):
 async def show_room_command(message: types.Message, state: FSMContext):
     """Хендлер просмотра комнаты."""
     await state.clear()
-    user = await User.objects.select_related(
-        "room", "room__admin", "game"
-    ).aget(telegram_id=message.from_user.id)
+    user = await get_user(message.from_user.id)
     if user.game:
         keyboard = await game_keyboard(user)
         await message.answer(
@@ -115,9 +112,7 @@ async def show_room_command(message: types.Message, state: FSMContext):
 @log_in_dev
 async def enter_room_command(message: types.Message, state: FSMContext):
     """Хендлер перехода в состояние входа в комнату."""
-    user = await User.objects.select_related("room").aget(
-        telegram_id=message.from_user.id
-    )
+    user = await get_user(message.from_user.id)
     if user.room:
         await message.answer(text=USER_CANT_ENTER_ROOM.format(user.room.slug))
         return
@@ -133,19 +128,15 @@ async def enter_room_command(message: types.Message, state: FSMContext):
 async def leave_room_command(message: types.Message, state: FSMContext):
     """Хендлер выхода/закрытия комнаты в которой находится пользователь."""
     await state.clear()
-    user = await User.objects.select_related("room", "room__admin").aget(
-        telegram_id=message.from_user.id
-    )
+    user = await get_user(message.from_user.id)
     room = user.room
     if room.admin == user:
         if room.started:
-            game = await Game.objects.aget(room=room)
-            game.is_closed = True
-            await game.asave(update_fields=("is_closed",))
-            async for character in Character.objects.filter(game=game):
-                character.in_game = False
-                await character.asave(update_fields=("in_game",))
+            user.game.is_closed = True
+            await user.game.asave(update_fields=("is_closed",))
         async for player in User.objects.filter(room=room):
+            player.game = None
+            await player.asave(update_fields=("game",))
             await message.bot.send_message(
                 chat_id=player.telegram_id,
                 text=ROOM_IS_CLOSED_MESSAGE.format(get_user_url(user)),

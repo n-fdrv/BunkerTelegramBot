@@ -20,6 +20,8 @@ pytils = "^0.4.1"
 redis = "^5.0.1"
 pillow = "^10.1.0"
 apscheduler = "^3.10.4"
+django-object-actions = "^4.2.0"
+aiogram = "^3.3.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"

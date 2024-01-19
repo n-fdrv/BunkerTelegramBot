@@ -73,23 +73,29 @@ async def game_keyboard(user: User, callback_data: GameCallbackData = None):
         keyboard.button(
             text=buttons.EPIDEMIA_BUTTON,
             callback_data=GameCallbackData(
-                action=game_action.get_epidemia, id=1
+                action=game_action.get_epidemia, id=user.game.pk
             ),
         )
     if action != game_action.get_bunker:
         keyboard.button(
             text=buttons.BUNKER_BUTTON,
-            callback_data=GameCallbackData(action=game_action.get_bunker),
+            callback_data=GameCallbackData(
+                action=game_action.get_bunker, id=user.game.pk
+            ),
         )
     if action != game_action.get_character:
         keyboard.button(
             text=buttons.CHARACTER_BUTTON,
-            callback_data=GameCallbackData(action=game_action.get_character),
+            callback_data=GameCallbackData(
+                action=game_action.get_character, id=user.game.pk
+            ),
         )
     if user.room.admin == user:
         keyboard.button(
             text=buttons.ROOM_SETTINGS_BUTTON,
-            callback_data=GameCallbackData(action=game_action.game_settings),
+            callback_data=GameCallbackData(
+                action=game_action.game_settings, id=user.game.pk
+            ),
         )
     keyboard.adjust(1)
     return keyboard

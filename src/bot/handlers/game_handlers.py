@@ -9,8 +9,9 @@ from bot.keyboards.inline_keyboards import (
     game_keyboard,
     game_settings_keyboard,
 )
-from bot.models import Character, User
+from bot.models import User
 from bot.utils.game_helpers import get_players_in_game_message, start_game
+from bot.utils.state_helpers import get_character, get_user
 from core.config.logging import log_in_dev
 
 router = Router()
@@ -24,17 +25,15 @@ async def start_game_callback(
     callback_data: GameCallbackData,
 ):
     """Хендлер начала игры."""
-    user = await User.objects.select_related("room", "room__admin").aget(
-        telegram_id=callback.from_user.id
-    )
+    user = await get_user(callback.from_user.id)
     text, started = await start_game(user.room)
     if not started:
         await callback.message.answer(text=text)
         return
     await callback.message.delete()
-    async for player in User.objects.select_related("room__admin").filter(
-        room=user.room
-    ).all():
+    async for player in User.objects.select_related(
+        "room__admin", "game"
+    ).filter(room=user.room).all():
         keyboard = await game_keyboard(player, callback_data=callback_data)
         await callback.message.bot.send_message(
             chat_id=player.telegram_id,
@@ -53,23 +52,9 @@ async def get_character_callback(
     callback_data: GameCallbackData,
 ):
     """Хендлер просмотра персонажа."""
-    user = await User.objects.select_related("room", "room__admin").aget(
-        telegram_id=callback.from_user.id
-    )
+    user = await get_user(callback.from_user.id)
+    character = await get_character(user)
     keyboard = await game_keyboard(user, callback_data=callback_data)
-    character = await Character.objects.select_related(
-        "profession",
-        "gender",
-        "orientation",
-        "health",
-        "phobia",
-        "hobby",
-        "personality",
-        "information",
-        "item",
-        "action_one",
-        "action_two",
-    ).aget(user=user, game__is_closed=False)
     await callback.message.edit_text(
         text=CHARACTER_GET_MESSAGE.format(
             character.profession,
@@ -151,9 +136,7 @@ async def get_game_settings_handler(
     callback_data: GameCallbackData,
 ):
     """Хендлер настроек игры."""
-    user = await User.objects.select_related("game").aget(
-        telegram_id=callback.from_user.id
-    )
+    user = await get_user(callback.from_user.id)
     text = await get_players_in_game_message(user.game)
     keyboard = await game_settings_keyboard()
     await callback.message.edit_text(
@@ -173,9 +156,7 @@ async def reload_game_handler(
     callback_data: GameCallbackData,
 ):
     """Хендлер перезапуска игры."""
-    user = await User.objects.select_related(
-        "room", "room__admin", "game"
-    ).aget(telegram_id=callback.from_user.id)
+    user = await get_user(callback.from_user.id)
     user.game.is_closed = True
     await user.game.asave(update_fields=("is_closed",))
     text, started = await start_game(user.room)
@@ -183,9 +164,9 @@ async def reload_game_handler(
         await callback.answer(text=text)
         return
     await callback.message.delete()
-    async for player in User.objects.select_related("room__admin").filter(
-        room=user.room
-    ).all():
+    async for player in User.objects.select_related(
+        "game", "room", "room__admin"
+    ).filter(room=user.room).all():
         keyboard = await game_keyboard(player)
         await callback.bot.send_message(
             chat_id=player.telegram_id,
@@ -204,9 +185,7 @@ async def close_game_handler(
     callback_data: GameCallbackData,
 ):
     """Хендлер закрытия игры и перехода в лобби."""
-    user = await User.objects.select_related(
-        "room", "room__admin", "game"
-    ).aget(telegram_id=callback.from_user.id)
+    user = await get_user(callback.from_user.id)
     user.game.is_closed = True
     user.room.started = False
     await user.room.asave(update_fields=("started",))
