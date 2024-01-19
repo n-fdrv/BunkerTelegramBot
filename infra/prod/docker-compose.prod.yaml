@@ -2,14 +2,13 @@
 services:
   redis:
     image: redis:latest
-    container_name: redis-coffee-bot
+    container_name: redis-bunker-bot
     ports:
       - 6379:6379
     volumes:
       - redis_data:/data
       - ../../logs/redis/:/var/log/
     restart: always
-
 
   postgres-db:
     image: postgres:15
@@ -21,7 +20,6 @@ services:
     restart: always
     volumes:
       - postgres-data:/var/lib/postgresql/data
-
 
   bot:
       image: oupsfed/bunker-telegram-bot
@@ -41,9 +39,6 @@ services:
       depends_on:
         - postgres-db
         - redis
-
-
-
 
   nginx:
     image: nginx:1.21.3-alpine
