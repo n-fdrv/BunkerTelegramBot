@@ -15,9 +15,8 @@ DEFAULT = '123:SOMEDEFAULTKEY:TEST'
 
 SECRET_KEY = env.str('SECRET_KEY', default=DEFAULT)
 
-ALLOWED_HOSTS = ['*']
-
-CSRF_TRUSTED_ORIGINS = ['http://localhost', ]
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=["*"])
 
 AUTH_USER_MODEL = "admin_user.AdminUser"
 
