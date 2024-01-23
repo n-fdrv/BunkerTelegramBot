@@ -23,4 +23,4 @@ async def get_character(user: User) -> Character:
         "item",
         "action_one",
         "action_two",
-    ).aget(user=user, game__is_closed=False)
+    ).aget(user=user, game=user.game)

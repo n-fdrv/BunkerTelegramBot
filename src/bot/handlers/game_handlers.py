@@ -26,6 +26,9 @@ async def start_game_callback(
 ):
     """Хендлер начала игры."""
     user = await get_user(callback.from_user.id)
+    if user.game:
+        await callback.message.delete()
+        return
     text, started = await start_game(user.room)
     if not started:
         await callback.message.answer(text=text)
@@ -186,11 +189,13 @@ async def close_game_handler(
 ):
     """Хендлер закрытия игры и перехода в лобби."""
     user = await get_user(callback.from_user.id)
+    await callback.message.delete()
+    if not user.game:
+        return
     user.game.is_closed = True
     user.room.started = False
     await user.room.asave(update_fields=("started",))
     await user.game.asave(update_fields=("is_closed",))
-    await callback.message.delete()
     await User.objects.filter(game=user.game).aupdate(game=None)
     async for player in User.objects.filter(room=user.room).all():
         await callback.bot.send_message(
