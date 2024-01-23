@@ -107,6 +107,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 TELEGRAM_TOKEN = env.str('TELEGRAM_TOKEN', default=DEFAULT)
+ADMIN_TELEGRAM_ID = env.int('ADMIN_TELEGRAM_ID', default=0)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

@@ -1,0 +1,38 @@
+{% extends 'admin/base_site.html' %}
+
+{% block title %}Тестовая страница в админке | Мой проект{% endblock %}
+
+{% comment %}{% block extrastyle %}{{ block.super }}
+    <link rel="stylesheet" href="{{ STATIC_URL }}path/css/style.css">
+{% endblock %}{% endcomment %}
+
+{% comment %}{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo;
+        <a href="{% url 'admin:spec_my_model_changelist' %}">Пункт хлебных крошек</a>
+        &rsaquo; Тестовая страница в админке
+    </div>
+{% endblock %}{% endcomment %}
+
+{% block content %}
+    <div class="fieldsets">
+        <fieldset class="module">
+            <h1>Просмотр логов</h1>
+            <p>Выберите файл для просмотра логов.</p>
+                {% for row in data %}
+                    <p>
+                        <strong style="color: darkgreen">{{row.0}}</strong> |
+                        <strong
+                        {% if 'ERROR' in row.1 %}
+                            style="color:darkred;"
+                        {% endif %}
+                        >{{row.1}}</strong> |
+                        <strong style="color: grey">{{row.2}}</strong> |
+                        <strong style="color: grey">{{row.3}}</strong> |
+                        <strong style="color: grey">{{row.4}}</strong>
+                    </p>
+                {% endfor %}
+        </fieldset>
+    </div>
+{% endblock %}

@@ -1,5 +1,7 @@
+import asyncio
 import sys
 
+from django.conf import settings
 from loguru import logger
 
 
@@ -52,6 +54,12 @@ def log_in_dev(func: object) -> object:
                 f"(ID: {user_id}) | "
                 f"{func_type}: {func.__name__} | "
                 f"Exception: {e.args}"
+            )
+            asyncio.ensure_future(
+                message.bot.send_message(
+                    chat_id=settings.ADMIN_TELEGRAM_ID,
+                    text="Произошла ошибка! проверьте логи!",
+                )
             )
             return
 
