@@ -16,9 +16,9 @@ async def start_game(room: Room):
     room.started = True
     await room.asave(update_fields=("started",))
     game = await generate_game(room)
-    async for player in User.objects.select_related("room").filter(
-        room=room
-    ).all():
+    async for player in (
+        User.objects.select_related("room").filter(room=room).all()
+    ):
         player.game = game
         await player.asave(update_fields=("game",))
         await generate_character(player, game)

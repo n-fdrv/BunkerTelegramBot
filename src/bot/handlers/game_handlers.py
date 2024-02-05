@@ -34,9 +34,11 @@ async def start_game_callback(
         await callback.message.answer(text=text)
         return
     await callback.message.delete()
-    async for player in User.objects.select_related(
-        "room__admin", "game"
-    ).filter(room=user.room).all():
+    async for player in (
+        User.objects.select_related("room__admin", "game")
+        .filter(room=user.room)
+        .all()
+    ):
         keyboard = await game_keyboard(player, callback_data=callback_data)
         await callback.message.bot.send_message(
             chat_id=player.telegram_id,
@@ -167,9 +169,11 @@ async def reload_game_handler(
         await callback.answer(text=text)
         return
     await callback.message.delete()
-    async for player in User.objects.select_related(
-        "game", "room", "room__admin"
-    ).filter(room=user.room).all():
+    async for player in (
+        User.objects.select_related("game", "room", "room__admin")
+        .filter(room=user.room)
+        .all()
+    ):
         keyboard = await game_keyboard(player)
         await callback.bot.send_message(
             chat_id=player.telegram_id,
