@@ -1,6 +1,6 @@
 from bot.constants import messages
 from bot.models import Game, Room, User
-from bot.utils.game_generator import generate_character, generate_game
+from bot.utils.game_generator import generate_characters, generate_game
 from bot.utils.user_helpers import get_user_url
 
 
@@ -16,12 +16,14 @@ async def start_game(room: Room):
     room.started = True
     await room.asave(update_fields=("started",))
     game = await generate_game(room)
+    user_data = []
     async for player in (
         User.objects.select_related("room").filter(room=room).all()
     ):
         player.game = game
         await player.asave(update_fields=("game",))
-        await generate_character(player, game)
+        user_data.append(player)
+    await generate_characters(user_data, game)
     return messages.GAME_STARTED_MESSAGE, True
 
 
