@@ -30,9 +30,7 @@ class UserAdmin(DjangoObjectActions, admin.ModelAdmin):
                 )
 
     download_csv.short_description = "Download selected as csv"
-
     changelist_actions = ("download_csv",)
-
     list_display = (
         "telegram_id",
         "first_name",
