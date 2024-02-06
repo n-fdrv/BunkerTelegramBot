@@ -87,6 +87,17 @@ class CharacterAdmin(admin.ModelAdmin):
     list_filter = ("game", "user", "game__is_closed")
 
 
+class CharacterInline(admin.TabularInline):
+    """Инлайн модель персонажей."""
+
+    model = Character
+
+    def get_extra(self, request, obj=None, **kwargs):
+        """Убирает дополнительные строки в модели."""
+        extra = 0
+        return extra
+
+
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     """Управление моделью партий игры."""
@@ -103,3 +114,16 @@ class GameAdmin(admin.ModelAdmin):
     )
     list_display_links = ("pk", "bunker_type")
     list_filter = ("is_closed",)
+    inlines = [CharacterInline]
+
+    def has_change_permission(self, request, obj=None):
+        """Запрещает менять объекты."""
+        return False
+
+    def has_add_permission(self, request):
+        """Запрещает добавлять объекты."""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Запрещает удалять объекты."""
+        return False

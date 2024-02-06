@@ -17,7 +17,7 @@ async def get_character(user: User) -> Character:
         "orientation",
         "health",
         "phobia",
-        "hobby",
+        "hobby.csv",
         "personality",
         "information",
         "item",

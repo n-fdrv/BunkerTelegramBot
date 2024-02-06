@@ -196,10 +196,10 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "hobby",
+                    "hobby.csv",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="hobby",
+                        related_name="hobby.csv",
                         to="bot.cart",
                         verbose_name="Хобби",
                     ),

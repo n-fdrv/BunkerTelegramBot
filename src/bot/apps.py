@@ -9,6 +9,7 @@ class BotConfig(AppConfig):
 
     default_auto_field = "django.db.models.BigAutoField"
     name = "bot"
+    verbose_name = "Настройки бота"
 
     def stop_bot(self, **kwargs):
         """Вызывается при остановке приложения."""
