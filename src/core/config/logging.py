@@ -49,6 +49,7 @@ def log_in_dev(func: object) -> object:
             logger.info(text)
             return result
         except Exception as e:
+            print(e)
             logger.error(
                 f"User: {username} "
                 f"(ID: {user_id}) | "

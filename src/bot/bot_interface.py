@@ -15,7 +15,12 @@ from loguru import logger
 from redis.asyncio.client import Redis
 
 from bot.constants import commands
-from bot.handlers import command_handlers, game_handlers, room_handlers
+from bot.handlers import (
+    command_handlers,
+    game_handlers,
+    room_handlers,
+    start_handlers,
+)
 
 
 async def on_startup(bot: Bot):
@@ -48,6 +53,7 @@ class AiogramApp:
         """Запускает бота."""
         routes = [
             command_handlers.router,
+            start_handlers.router,
             room_handlers.router,
             game_handlers.router,
         ]
@@ -60,28 +66,12 @@ class AiogramApp:
                         description=commands.START_DESCRIPTION,
                     ),
                     BotCommand(
-                        command=commands.NEW_GAME_ROOM_COMMAND,
-                        description=commands.NEW_GAME_ROOM_DESCRIPTION,
-                    ),
-                    BotCommand(
-                        command=commands.ENTER_GAME_ROOM_COMMAND,
-                        description=commands.ENTER_GAME_ROOM_DESCRIPTION,
-                    ),
-                    BotCommand(
-                        command=commands.MY_GAME_ROOM_COMMAND,
-                        description=commands.MY_GAME_ROOM_DESCRIPTION,
-                    ),
-                    BotCommand(
-                        command=commands.LEAVE_GAME_ROOM_COMMAND,
-                        description=commands.LEAVE_GAME_ROOM_DESCRIPTION,
-                    ),
-                    BotCommand(
                         command=commands.HELP_COMMAND,
                         description=commands.HELP_DESCRIPTION,
                     ),
                     BotCommand(
-                        command=commands.RULES_COMMAND,
-                        description=commands.RULES_DESCRIPTION,
+                        command=commands.SUPPORT_COMMAND,
+                        description=commands.SUPPORT_DESCRIPTION,
                     ),
                 ]
             )

@@ -36,5 +36,7 @@ async def get_players_in_room_message(room: Room):
     players_amount = await User.objects.filter(room=room).acount()
     players_info = ""
     async for player in User.objects.filter(room=room).all():
-        players_info += f"- {get_user_url(player)}\n"
+        players_info += f"\n- {get_user_url(player)}"
+        if player == room.admin:
+            players_info += " (Администратор)"
     return ROOM_GET_MESSAGE.format(room.slug, players_amount, players_info)

@@ -27,7 +27,8 @@ services:
       command: >
         bash -c "python manage.py migrate &&
         python manage.py collectstatic --no-input &&
-        python manage.py upload_carts &&
+        python manage.py upload_information_carts &&
+        python manage.py upload_action_carts &&
         uvicorn core.asgi:application --host 0.0.0.0 --port 8000"
       volumes:
         - static_value:/app/static/

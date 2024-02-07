@@ -1,11 +1,107 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from game.models import Room
 
-from bot.constants import buttons
-from bot.constants.actions import game_action, room_action
-from bot.constants.callback_data import GameCallbackData, RoomCallbackData
+from bot.constants import buttons, messages
+from bot.constants.actions import game_action, room_action, start_action
+from bot.constants.callback_data import (
+    GameCallbackData,
+    RoomCallbackData,
+    StartCallbackData,
+)
 from bot.models import User
 from bot.utils.back_button_builder import back_builder
+
+
+async def start_keyboard():
+    """Клавиатура при команде /start."""
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(
+        text=buttons.CREATE_ROOM_BUTTON,
+        callback_data=RoomCallbackData(action=room_action.create),
+    )
+    keyboard.button(
+        text=buttons.ENTER_ROOM_BUTTON,
+        callback_data=RoomCallbackData(action=room_action.enter),
+    )
+    keyboard.button(
+        text=buttons.ABOUT_BUTTON,
+        callback_data=StartCallbackData(action=start_action.about),
+    )
+    keyboard.button(
+        text=buttons.RULES_BUTTON,
+        callback_data=StartCallbackData(action=start_action.rules),
+    )
+    keyboard.button(
+        text=buttons.HELP_BUTTON,
+        callback_data=StartCallbackData(action=start_action.help),
+    )
+    keyboard.adjust(1)
+    return keyboard
+
+
+async def help_keyboard():
+    """Клавиатура помощи."""
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(
+        text=buttons.BACK_BUTTON,
+        callback_data=StartCallbackData(action=start_action.get),
+    )
+    keyboard.adjust(1)
+    return keyboard
+
+
+async def about_keyboard(page: int = 1):
+    """Клавиатура об игре."""
+    keyboard = InlineKeyboardBuilder()
+    if page == 1:
+        keyboard.button(
+            text=buttons.NEXT_PAGE_BUTTON,
+            callback_data=StartCallbackData(
+                action=start_action.about, page=page + 1
+            ),
+        )
+    else:
+        keyboard.button(
+            text=buttons.PREVIOUS_PAGE_BUTTON,
+            callback_data=StartCallbackData(
+                action=start_action.about, page=page - 1
+            ),
+        )
+    keyboard.button(
+        text=buttons.BACK_BUTTON,
+        callback_data=StartCallbackData(action=start_action.get),
+    )
+    keyboard.adjust(1)
+    return keyboard
+
+
+async def rules_keyboard(page: int = 1):
+    """Клавиатура правил игры."""
+    keyboard = InlineKeyboardBuilder()
+    buttons_number = 0
+    page_amount = len(messages.RULES_MESSAGE)
+    if page > 1:
+        keyboard.button(
+            text=buttons.PREVIOUS_PAGE_BUTTON,
+            callback_data=StartCallbackData(
+                action=start_action.rules, page=page - 1
+            ),
+        )
+        buttons_number += 1
+    if page < page_amount:
+        keyboard.button(
+            text=buttons.NEXT_PAGE_BUTTON,
+            callback_data=StartCallbackData(
+                action=start_action.rules, page=page + 1
+            ),
+        )
+        buttons_number += 1
+    keyboard.button(
+        text=buttons.BACK_BUTTON,
+        callback_data=StartCallbackData(action=start_action.get),
+    )
+    keyboard.adjust(buttons_number, 1)
+    return keyboard
 
 
 async def cancel_state_keyboard():
@@ -19,18 +115,25 @@ async def cancel_state_keyboard():
     return keyboard
 
 
-async def room_admin_keyboard():
-    """Метод формирования клавиатуры администратора комнаты."""
+async def room_keyboard(user):
+    """Метод формирования клавиатуры комнаты."""
     keyboard = InlineKeyboardBuilder()
+    exit_button = buttons.EXIT_ROOM_BUTTON
+    if user == user.room.admin:
+        keyboard.button(
+            text=buttons.BEGIN_BUTTON,
+            callback_data=GameCallbackData(action=game_action.start),
+        )
+        keyboard.button(
+            text=buttons.DISMISS_PLAYERS_BUTTON,
+            callback_data=RoomCallbackData(
+                action=room_action.players,
+            ),
+        )
+        exit_button = buttons.CLOSE_ROOM_BUTTON
     keyboard.button(
-        text=buttons.BEGIN_BUTTON,
-        callback_data=GameCallbackData(action=game_action.start),
-    )
-    keyboard.button(
-        text=buttons.DISMISS_PLAYERS_BUTTON,
-        callback_data=RoomCallbackData(
-            action=room_action.players,
-        ),
+        text=exit_button,
+        callback_data=RoomCallbackData(action=room_action.exit_room),
     )
     keyboard.adjust(1)
     return keyboard
@@ -59,7 +162,7 @@ async def show_players_keyboard(room: Room):
             ),
         )
         rows.append(2)
-    keyboard = await back_builder(keyboard, room_action.admin_get)
+    keyboard = await back_builder(keyboard, room_action.get)
     keyboard.adjust(*rows, 1)
     return keyboard
 

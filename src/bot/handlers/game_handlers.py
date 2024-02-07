@@ -16,6 +16,7 @@ from bot.constants.callback_data import GameCallbackData
 from bot.keyboards.inline_keyboards import (
     game_keyboard,
     game_settings_keyboard,
+    room_keyboard,
 )
 from bot.models import User
 from bot.utils.user_helpers import get_user
@@ -189,8 +190,12 @@ async def close_game_handler(
     await user.room.asave(update_fields=("started",))
     await user.game.asave(update_fields=("closed_date",))
     await User.objects.filter(game=user.game).aupdate(game=None)
-    async for player in User.objects.filter(room=user.room).all():
+    async for player in User.objects.select_related("room__admin").filter(
+        room=user.room
+    ).all():
+        keyboard = await room_keyboard(player)
         await callback.bot.send_message(
             chat_id=player.telegram_id,
             text=messages.GAME_CLOSED_MESSAGE,
+            reply_markup=keyboard.as_markup(),
         )

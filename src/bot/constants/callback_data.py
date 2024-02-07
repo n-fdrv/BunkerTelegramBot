@@ -12,6 +12,12 @@ class BaseCallbackData(CallbackData, prefix="pac"):
     back_action: Optional[str] = None
 
 
+class StartCallbackData(BaseCallbackData, prefix="st"):
+    """Callback_data для игры."""
+
+    pass
+
+
 class RoomCallbackData(BaseCallbackData, prefix="r"):
     """Callback_data для комнат."""
 
@@ -27,4 +33,5 @@ class GameCallbackData(BaseCallbackData, prefix="g"):
 CALLBACK_DATA_PREFIX = {
     RoomCallbackData.__prefix__: RoomCallbackData,
     GameCallbackData.__prefix__: GameCallbackData,
+    StartCallbackData.__prefix__: StartCallbackData,
 }

@@ -20,17 +20,24 @@ class Action:
         return self.callback
 
 
+class StartAction(Action):
+    """Действия для callback_data старта."""
+
+    about = "st-about"
+    help = "st-help"
+    rules = "st-rules"
+
+
 class RoomAction(Action):
     """Действия для callback_data комнат."""
 
-    enter = "r-e"
-    rules = "r-r"
+    create = "r-cr"
+    enter = "r-en"
     cancel = "r-c"
-    players = "r=p"
-    close_room = "r-cr"
+    players = "r-p"
+    exit_room = "r-exr"
     player_get = "r-pg"
-    player_kick = "r=kp"
-    admin_get = "r-ag"
+    player_kick = "r-kp"
 
 
 class GameAction(Action):
@@ -47,3 +54,4 @@ class GameAction(Action):
 
 room_action = RoomAction("r")
 game_action = GameAction("g")
+start_action = StartAction("st")
