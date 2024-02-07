@@ -1,3 +1,4 @@
+SUPPORT_BUTTON = "Ссылка на форму"
 CREATE_ROOM_BUTTON = "Создать комнату 🆕"
 ENTER_ROOM_BUTTON = "Зайти в комнату 🚪"
 ABOUT_BUTTON = "Об игре ℹ️"

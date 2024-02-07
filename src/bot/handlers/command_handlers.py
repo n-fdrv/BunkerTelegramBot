@@ -7,8 +7,9 @@ from bot.constants import commands
 from bot.constants.messages import (
     HELP_MESSAGE,
     START_MESSAGE,
+    SUPPORT_MESSAGE,
 )
-from bot.keyboards.inline_keyboards import start_keyboard
+from bot.keyboards.inline_keyboards import start_keyboard, support_keyboard
 from bot.models import User
 from bot.utils.user_helpers import get_user
 from core.config.logging import log_in_dev
@@ -43,7 +44,10 @@ async def help_handler(message: types.Message, state: FSMContext):
 @log_in_dev
 async def support_handler(message: types.Message, state: FSMContext):
     """Хендлер команды rules."""
-    pass
+    keyboard = await support_keyboard()
+    await message.answer(
+        text=SUPPORT_MESSAGE, reply_markup=keyboard.as_markup()
+    )
 
 
 @router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=KICKED))

@@ -1,4 +1,5 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from django.conf import settings
 from game.models import Room
 
 from bot.constants import buttons, messages
@@ -35,6 +36,14 @@ async def start_keyboard():
         text=buttons.HELP_BUTTON,
         callback_data=StartCallbackData(action=start_action.help),
     )
+    keyboard.adjust(1)
+    return keyboard
+
+
+async def support_keyboard():
+    """Клавиатура поддержки."""
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(text=buttons.SUPPORT_BUTTON, url=settings.SUPPORT_FORM_URL)
     keyboard.adjust(1)
     return keyboard
 
