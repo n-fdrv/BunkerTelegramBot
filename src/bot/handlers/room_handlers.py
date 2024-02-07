@@ -2,6 +2,7 @@ from datetime import datetime
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
+from game.utils.room import create_room, get_players_in_room_message, get_room
 
 from bot.constants import messages
 from bot.constants.actions import room_action
@@ -23,11 +24,6 @@ from bot.keyboards.inline_keyboards import (
     start_keyboard,
 )
 from bot.models import User
-from bot.utils.room_helpers import (
-    create_room,
-    get_players_in_room_message,
-    get_room,
-)
 from bot.utils.user_helpers import get_user, get_user_url
 from core.config.logging import log_in_dev
 
