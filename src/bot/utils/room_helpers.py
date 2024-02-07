@@ -1,7 +1,9 @@
 from random import randint
 
+from game.models import Room
+
 from bot.constants.messages import ROOM_GET_MESSAGE
-from bot.models import Room, User
+from bot.models import User
 from bot.utils.user_helpers import get_user_url
 
 

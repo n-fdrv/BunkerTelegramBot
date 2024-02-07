@@ -1,6 +1,13 @@
 from bot.models import User
 
 
+async def get_user(user_id: int) -> User:
+    """Метод получения пользователя из базы данных."""
+    return await User.objects.select_related(
+        "room", "game", "room__admin"
+    ).aget(telegram_id=user_id)
+
+
 def get_user_url(user: User) -> str:
     """Метод формирования ссылки на пользователя."""
     name = user.telegram_username

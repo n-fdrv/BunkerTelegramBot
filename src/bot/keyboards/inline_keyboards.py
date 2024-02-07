@@ -1,9 +1,10 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from game.models import Room
 
 from bot.constants import buttons
 from bot.constants.actions import game_action, room_action
 from bot.constants.callback_data import GameCallbackData, RoomCallbackData
-from bot.models import Room, User
+from bot.models import User
 from bot.utils.back_button_builder import back_builder
 
 

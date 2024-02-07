@@ -64,6 +64,28 @@ class TypeInformationCarts(models.TextChoices):
     ITEM = "item", "Багаж"
 
 
+class Room(models.Model):
+    """Модель для хранения комнат."""
+
+    slug = models.IntegerField(verbose_name="Номер комнаты", unique=True)
+    admin = models.ForeignKey(
+        to="bot.User",
+        on_delete=models.CASCADE,
+        verbose_name="Администратор комнаты",
+        related_name="room_admin",
+        blank=True,
+        null=True,
+    )
+    started = models.BooleanField(verbose_name="Игра начата", default=False)
+
+    class Meta:
+        verbose_name = "Комната"
+        verbose_name_plural = "Комнаты"
+
+    def __str__(self):
+        return f"{self.slug}"
+
+
 class ActionCart(models.Model):
     """Модель хранения действий персонажа."""
 
@@ -117,30 +139,146 @@ class InformationCart(models.Model):
         return f"{self.name}"
 
 
-# class Character(models.Model):
-#     """Модель для хранения сгенерированных персонажей."""
-#
-#     user = models.ForeignKey(
-#         User, on_delete=models.CASCADE, verbose_name="Пользователь"
-#     )
-#     age = models.IntegerField(verbose_name="Возраст")
-#     # game = models.ForeignKey(
-#     #     Game, on_delete=models.CASCADE, verbose_name="Игра"
-#     # )
-#
-#     class Meta:
-#         verbose_name = "Персонаж"
-#         verbose_name_plural = "Персонажи"
-#
-#     def __str__(self):
-#         return (
-#             f"{self.profession} {self.age} {self.gender} | "
-#             f"Пользователь: {self.user}"
-#         )
-#
-#     def get_main_info(self):
-#         """Метод получения основной информации о персонаже."""
-#         return (
-#             f"{self.profession} - {self.gender} "
-#             f"{self.age} лет ({self.orientation})"
-#         )
+class Game(models.Model):
+    """Модель для хранения партий игры."""
+
+    epidemia_time = models.IntegerField(
+        verbose_name="Лет до выхода на поверхность"
+    )
+    bunker_place_amount = models.IntegerField(
+        verbose_name="Количество мест в бункере"
+    )
+    information_carts = models.ManyToManyField(
+        InformationCart,
+        through="InformationGame",
+        related_name="information_carts",
+    )
+    unique_carts = models.ManyToManyField(
+        InformationCart, through="UniqueCartGame", related_name="unique_carts"
+    )
+    created_date = models.DateTimeField(
+        auto_now_add=True, verbose_name="Дата начала игры"
+    )
+    closed_date = models.DateTimeField(
+        verbose_name="Дата окончания игры", null=True, blank=True
+    )
+
+    class Meta:
+        verbose_name = "Игра"
+        verbose_name_plural = "Игры"
+
+    def __str__(self):
+        return f"Игра №{self.pk}"
+
+
+class InformationGame(models.Model):
+    """Модель хранения карточек действий персонажей."""
+
+    cart = models.ForeignKey(
+        InformationCart,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Карточка",
+    )
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, verbose_name="Игра"
+    )
+
+    class Meta:
+        verbose_name = "Карточка информации игры"
+        verbose_name_plural = "Карточки информации игры"
+
+    def __str__(self):
+        return f"{self.cart}"
+
+
+class UniqueCartGame(models.Model):
+    """Модель хранения уникальных карт в игре."""
+
+    cart = models.ForeignKey(
+        InformationCart,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Карточка",
+    )
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, verbose_name="Игра"
+    )
+
+    class Meta:
+        verbose_name = "Уникальная карта в игре"
+        verbose_name_plural = "Уникальные карты в игре"
+
+    def __str__(self):
+        return f"{self.cart}"
+
+
+class Character(models.Model):
+    """Модель для хранения сгенерированных персонажей."""
+
+    user = models.ForeignKey(
+        to="bot.User",
+        on_delete=models.SET_NULL,
+        verbose_name="Пользователь",
+        null=True,
+        blank=True,
+    )
+    age = models.IntegerField(verbose_name="Возраст")
+    information_carts = models.ManyToManyField(
+        InformationCart, through="InformationCharacter"
+    )
+    action_carts = models.ManyToManyField(
+        ActionCart, through="ActionCharacter"
+    )
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, verbose_name="Игра"
+    )
+
+    class Meta:
+        verbose_name = "Персонаж"
+        verbose_name_plural = "Персонажи"
+
+    def __str__(self):
+        return f"id: {self.user.telegram_id} | Game: {self.game.pk}"
+
+
+class InformationCharacter(models.Model):
+    """Модель хранения информационных карточек персонажей."""
+
+    cart = models.ForeignKey(
+        InformationCart,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Карточка",
+    )
+    character = models.ForeignKey(
+        Character, on_delete=models.CASCADE, verbose_name="Персонаж"
+    )
+
+    class Meta:
+        verbose_name = "Карточка информации персонажа"
+        verbose_name_plural = "Карточки информации персонажа"
+
+    def __str__(self):
+        return f"{self.character.user} | {self.cart.name}"
+
+
+class ActionCharacter(models.Model):
+    """Модель хранения карточек действий персонажей."""
+
+    cart = models.ForeignKey(
+        ActionCart,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Карточка",
+    )
+    character = models.ForeignKey(
+        Character, on_delete=models.CASCADE, verbose_name="Персонаж"
+    )
+
+    class Meta:
+        verbose_name = "Карточка действий персонажа"
+        verbose_name_plural = "Карточки действий персонажа"
+
+    def __str__(self):
+        return f"{self.character.user} | {self.cart.name}"

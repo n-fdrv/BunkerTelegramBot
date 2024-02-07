@@ -1,6 +1,23 @@
 from django.contrib import admin
 
-from game.models import ActionCart, InformationCart
+from game.models import ActionCart, Character, Game, InformationCart, Room
+
+
+@admin.register(Room)
+class RoomAdmin(admin.ModelAdmin):
+    """Управление моделью пользователя."""
+
+    list_display = (
+        "slug",
+        "admin",
+        "started",
+    )
+    list_filter = ("started",)
+    search_fields = ("slug",)
+    readonly_fields = (
+        "slug",
+        "started",
+    )
 
 
 @admin.register(InformationCart)
@@ -24,3 +41,62 @@ class ActionCartAdmin(admin.ModelAdmin):
     list_display_links = ("name",)
     list_filter = ("key", "target", "value")
     search_fields = ("name",)
+
+
+class InformationCharacterInline(admin.TabularInline):
+    """Инлайн модель карт информации персонажа."""
+
+    model = Character.information_carts.through
+    extra = 1
+
+
+class ActionCharacterInline(admin.TabularInline):
+    """Инлайн модель карт действий персонажа."""
+
+    model = Character.action_carts.through
+    extra = 1
+
+
+@admin.register(Character)
+class CharacterAdmin(admin.ModelAdmin):
+    """Управление персонажами."""
+
+    list_display = (
+        "user",
+        "age",
+    )
+    list_display_links = ("user",)
+    list_filter = ("user",)
+    search_fields = ("user",)
+    inlines = (InformationCharacterInline, ActionCharacterInline)
+
+    def has_change_permission(self, request, obj=None):
+        """Запрещает менять объект."""
+        return False
+
+
+class InformationGameInline(admin.TabularInline):
+    """Инлайн модель карт информаций игры."""
+
+    model = Game.information_carts.through
+    extra = 1
+
+
+class UniqueCartsInline(admin.TabularInline):
+    """Инлайн модель уникальных карт игры."""
+
+    model = Game.unique_carts.through
+    extra = 1
+
+
+@admin.register(Game)
+class GameAdmin(admin.ModelAdmin):
+    """Управление играми."""
+
+    list_display = ("pk", "created_date", "closed_date")
+    list_display_links = ("pk",)
+    inlines = (InformationGameInline, UniqueCartsInline)
+
+    def has_change_permission(self, request, obj=None):
+        """Запрещает менять объект."""
+        return False

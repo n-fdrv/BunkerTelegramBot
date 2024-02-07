@@ -45,7 +45,7 @@ createsuperuser: # Создать супер пользователя
 	poetry run python src/manage.py createsuperuser --noinput
 
 upload-data: # Загрузить данные
-	cd src && poetry run python manage.py upload_carts && cd ..
+	cd src && poetry run python manage.py upload_information_carts && poetry run python manage.py upload_action_carts && cd ..
 
 run-app: # Запуск Django и Telegram бота
 	@echo -e "$(COLOR_YELLOW)Starting bot...$(COLOR_RESET)"

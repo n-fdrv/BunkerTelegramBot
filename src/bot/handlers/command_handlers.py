@@ -24,8 +24,7 @@ from bot.keyboards import inline_keyboards
 from bot.keyboards.inline_keyboards import cancel_state_keyboard, game_keyboard
 from bot.models import User
 from bot.utils.room_helpers import create_room, get_players_in_room_message
-from bot.utils.state_helpers import get_user
-from bot.utils.user_helpers import get_user_url
+from bot.utils.user_helpers import get_user, get_user_url
 from core.config.logging import log_in_dev
 
 router = Router()
