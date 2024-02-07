@@ -14,6 +14,7 @@ from bot.constants import messages
 from bot.constants.actions import game_action
 from bot.constants.callback_data import GameCallbackData
 from bot.keyboards.inline_keyboards import (
+    game_all_info_keyboard,
     game_keyboard,
     game_settings_keyboard,
     room_keyboard,
@@ -116,6 +117,39 @@ async def get_bunker_callback(
     keyboard = await game_keyboard(user, callback_data=callback_data)
     await callback.message.edit_text(
         text=await get_bunker_info_text(user.game),
+        reply_markup=keyboard.as_markup(),
+    )
+
+
+@router.callback_query(
+    GameCallbackData.filter(F.action == game_action.get_all_info)
+)
+@log_in_dev
+async def get_all_info_callback(
+    callback: types.CallbackQuery,
+    state: FSMContext,
+    callback_data: GameCallbackData,
+):
+    """Хендлер просмотра всей информации."""
+    user = await User.objects.select_related(
+        "game",
+        "room__admin",
+    ).aget(telegram_id=callback.from_user.id)
+    text = "<b>Эпидемия:</b>\n"
+    text += messages.EPIDEMIA_GET_MESSAGE.format(
+        await user.game.information_carts.filter(
+            type=TypeInformationCarts.EPIDEMIA
+        ).alast(),
+        user.game.epidemia_time,
+    )
+    text += "\n\n<b>Бункер:</b>\n"
+    text += await get_bunker_info_text(user.game)
+    text += "\n<b>Персонаж:</b>\n"
+    character = await get_character(user)
+    text += await get_character_info_text(character)
+    keyboard = await game_all_info_keyboard(user, callback_data=callback_data)
+    await callback.message.edit_text(
+        text=text,
         reply_markup=keyboard.as_markup(),
     )
 

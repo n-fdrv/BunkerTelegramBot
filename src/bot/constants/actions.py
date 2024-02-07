@@ -47,6 +47,7 @@ class GameAction(Action):
     get_epidemia = "g-ge"
     get_bunker = "g-gb"
     get_character = "g-gc"
+    get_all_info = "g-gai"
     game_settings = "g-gs"
     reload_game = "g-rg"
     close_game = "g-cg"

@@ -203,6 +203,34 @@ async def game_keyboard(user: User, callback_data: GameCallbackData = None):
                 action=game_action.get_character, id=user.game.pk
             ),
         )
+    keyboard.button(
+        text=buttons.ALL_INFO_BUTTON,
+        callback_data=GameCallbackData(
+            action=game_action.get_all_info, id=user.game.pk
+        ),
+    )
+    if user.room.admin == user:
+        keyboard.button(
+            text=buttons.ROOM_SETTINGS_BUTTON,
+            callback_data=GameCallbackData(
+                action=game_action.game_settings, id=user.game.pk
+            ),
+        )
+    keyboard.adjust(1)
+    return keyboard
+
+
+async def game_all_info_keyboard(
+    user: User, callback_data: GameCallbackData = None
+):
+    """Клавиатура режима игры в одном сообщении."""
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(
+        text=buttons.EXIT_ALL_INFO_BUTTON,
+        callback_data=GameCallbackData(
+            action=game_action.get_epidemia, id=user.game.pk
+        ),
+    )
     if user.room.admin == user:
         keyboard.button(
             text=buttons.ROOM_SETTINGS_BUTTON,
