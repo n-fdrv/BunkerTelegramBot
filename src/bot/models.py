@@ -47,7 +47,7 @@ class User(models.Model):
     @property
     def full_name(self):
         """Возвращает полное имя пользователя."""
-        return f"{self.name} {self.last_name}"
+        return f"{self.first_name} {self.last_name}"
 
     class Meta:
         verbose_name = "Пользователь"

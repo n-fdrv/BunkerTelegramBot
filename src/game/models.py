@@ -156,9 +156,13 @@ class Game(models.Model):
     unique_carts = models.ManyToManyField(
         InformationCart, through="UniqueCartGame", related_name="unique_carts"
     )
+    users = models.ManyToManyField(
+        to="bot.User", through="UserGame", related_name="users"
+    )
     created_date = models.DateTimeField(
         auto_now_add=True, verbose_name="Дата начала игры"
     )
+    closed = models.BooleanField(default=False, verbose_name="Сыграна")
     closed_date = models.DateTimeField(
         verbose_name="Дата окончания игры", null=True, blank=True
     )
@@ -169,6 +173,26 @@ class Game(models.Model):
 
     def __str__(self):
         return f"Игра №{self.pk}"
+
+
+class UserGame(models.Model):
+    """Модель хранения пользователей в играх."""
+
+    user = models.ForeignKey(
+        to="bot.User",
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+    )
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, verbose_name="Игра"
+    )
+
+    class Meta:
+        verbose_name = "Карточка информации игры"
+        verbose_name_plural = "Карточки информации игры"
+
+    def __str__(self):
+        return f"{self.user.full_name}"
 
 
 class InformationGame(models.Model):
@@ -239,7 +263,13 @@ class Character(models.Model):
         verbose_name_plural = "Персонажи"
 
     def __str__(self):
-        return f"id: {self.user.telegram_id} | Game: {self.game.pk}"
+        gender = self.information_carts.filter(
+            type=TypeInformationCarts.GENDER
+        ).last()
+        profession = self.information_carts.filter(
+            type=TypeInformationCarts.PROFESSION
+        ).last()
+        return f"{gender} {self.age} лет ({profession})"
 
 
 class InformationCharacter(models.Model):

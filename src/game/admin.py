@@ -61,13 +61,10 @@ class ActionCharacterInline(admin.TabularInline):
 class CharacterAdmin(admin.ModelAdmin):
     """Управление персонажами."""
 
-    list_display = (
-        "user",
-        "age",
-    )
-    list_display_links = ("user",)
+    list_display = ("__str__", "user", "game")
     list_filter = ("user",)
     search_fields = ("user",)
+    empty_value_display = "Удален"
     inlines = (InformationCharacterInline, ActionCharacterInline)
 
     def has_change_permission(self, request, obj=None):
@@ -89,13 +86,23 @@ class UniqueCartsInline(admin.TabularInline):
     extra = 1
 
 
+class UserGameInline(admin.TabularInline):
+    """Инлайн модель пользователей в игре."""
+
+    model = Game.users.through
+    extra = 1
+
+
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     """Управление играми."""
 
-    list_display = ("pk", "created_date", "closed_date")
-    list_display_links = ("pk",)
-    inlines = (InformationGameInline, UniqueCartsInline)
+    list_display = ("__str__", "created_date", "closed", "closed_date")
+    list_filter = ("closed",)
+    inlines = (
+        UserGameInline,
+        InformationGameInline,
+    )
 
     def has_change_permission(self, request, obj=None):
         """Запрещает менять объект."""

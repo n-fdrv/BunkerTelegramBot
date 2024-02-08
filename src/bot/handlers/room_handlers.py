@@ -111,8 +111,8 @@ async def exit_room_handler(
         return
     if room.admin == user:
         if room.started:
-            user.game.closed = datetime.now()
-            await user.game.asave(update_fields=("is_closed",))
+            user.game.closed_date = datetime.now()
+            await user.game.asave(update_fields=("closed_date",))
         await callback.message.delete()
         async for player in User.objects.filter(room=room):
             player.game = None
