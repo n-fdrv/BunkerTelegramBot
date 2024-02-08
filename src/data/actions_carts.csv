@@ -53,3 +53,13 @@
 Перегенерируй количество припасов,generate_int,self,bunker_supply,True
 Перегенерируй эпидемию,generate_bunker_cart,self,epidemia,True
 Перегенерируй тип бункера,generate_bunker_cart,self,bunker_type,True
+Перегенерируй любому игроку профессию,generate_cart,any,profession,True
+Перегенерируй любому игроку пол,generate_cart,any,gender,True
+Перегенерируй любому игроку возраст,generate_int,any,age,True
+Перегенерируй любому игроку ориентацию,generate_cart,any,orientation,True
+Перегенерируй любому игроку здоровье,generate_cart,any,health,True
+Перегенерируй любому игроку характер,generate_cart,any,personality,True
+Перегенерируй любому игроку фобию,generate_cart,any,phobia,True
+Перегенерируй любому игроку хобби,generate_cart,any,hobby,True
+Перегенерируй любому игроку доп. информацию,generate_cart,any,add_info,True
+Перегенерируй любому игроку багаж,generate_cart,any,item,True

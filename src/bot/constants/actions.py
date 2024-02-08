@@ -57,6 +57,7 @@ class ActionCartAction(Action):
     """Действия для callback_data действий."""
 
     use_cart = "ac-us"
+    choose_target = "ac-ct"
 
 
 room_action = RoomAction("r")

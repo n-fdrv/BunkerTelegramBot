@@ -33,9 +33,7 @@ class GameCallbackData(BaseCallbackData, prefix="g"):
 class ActionCartCallbackData(BaseCallbackData, prefix="ac"):
     """Callback_data для действий."""
 
-    key: Optional[str] = None
-    target: Optional[str] = None
-    value: Optional[str] = None
+    target: Optional[int] = None
 
 
 CALLBACK_DATA_PREFIX = {

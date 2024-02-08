@@ -67,9 +67,9 @@ class CharacterAdmin(admin.ModelAdmin):
     empty_value_display = "Удален"
     inlines = (InformationCharacterInline, ActionCharacterInline)
 
-    def has_change_permission(self, request, obj=None):
-        """Запрещает менять объект."""
-        return False
+    # def has_change_permission(self, request, obj=None):
+    #     """Запрещает менять объект."""
+    #     return False
 
 
 class InformationGameInline(admin.TabularInline):

@@ -54,8 +54,13 @@ async def action_get(
         )
         return
     if cart.target == TargetAction.ANY:
-        pass
-        # сообщение и клавиатура выбор цели
+        keyboard = await action_keyboards.choose_target_keyboard(
+            callback_data, user.game
+        )
+        await callback.message.edit_text(
+            text=action_messages.CHOOSE_TARGET_MESSAGE,
+            reply_markup=keyboard.as_markup(),
+        )
         return
     await state.update_data(target=[character])
     if cart.target == TargetAction.ALL:
@@ -67,6 +72,25 @@ async def action_get(
         ):
             target_data.append(target)
         await state.update_data(target=target_data)
+    keyboard = await action_keyboards.cart_confirmation_keyboard(callback_data)
+    await callback.message.edit_text(
+        text=action_messages.CONFIRMATION_MESSAGE,
+        reply_markup=keyboard.as_markup(),
+    )
+
+
+@router.callback_query(
+    ActionCartCallbackData.filter(F.action == action_cart_action.choose_target)
+)
+@log_in_dev
+async def choose_target(
+    callback: types.CallbackQuery,
+    state: FSMContext,
+    callback_data: ActionCartCallbackData,
+):
+    """Хендлер подверждения выбранной цели."""
+    target = await get_user(callback_data.target)
+    await state.update_data(target=[await get_character(target)])
     keyboard = await action_keyboards.cart_confirmation_keyboard(callback_data)
     await callback.message.edit_text(
         text=action_messages.CONFIRMATION_MESSAGE,
