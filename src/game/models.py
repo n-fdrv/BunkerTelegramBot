@@ -188,8 +188,8 @@ class UserGame(models.Model):
     )
 
     class Meta:
-        verbose_name = "Карточка информации игры"
-        verbose_name_plural = "Карточки информации игры"
+        verbose_name = "Пользователь в игре"
+        verbose_name_plural = "Пользователи в игре"
 
     def __str__(self):
         return f"{self.user.full_name}"

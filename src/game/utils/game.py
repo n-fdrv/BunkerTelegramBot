@@ -1,3 +1,4 @@
+from datetime import datetime
 from random import randint
 
 from django.conf import settings
@@ -27,6 +28,7 @@ async def start_game(room: Room):
         User.objects.select_related("room").filter(room=room).all()
     ):
         player.game = game
+        await game.users.aadd(player)
         await player.asave(update_fields=("game",))
         await create_character(player, game)
     return messages.GAME_STARTED_MESSAGE, True
@@ -61,6 +63,15 @@ async def create_game(room: Room) -> Game:
     await game.information_carts.aadd(
         epidemia, bunker_type, room_one, room_two, room_three
     )
+    return game
+
+
+async def close_game(game: Game) -> Game:
+    """Закрывает игру и удаляет пользователям поле в игре."""
+    await game.users.aupdate(game=None)
+    game.closed_date = datetime.now()
+    game.closed = True
+    await game.asave(update_fields=("closed_date", "closed"))
     return game
 
 

@@ -1,10 +1,9 @@
-from datetime import datetime
-
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from game.models import TypeInformationCarts
 from game.utils.character import get_character, get_character_info_text
 from game.utils.game import (
+    close_game,
     get_bunker_info_text,
     get_players_in_game_message,
     start_game,
@@ -185,8 +184,7 @@ async def reload_game_handler(
 ):
     """Хендлер перезапуска игры."""
     user = await get_user(callback.from_user.id)
-    user.game.closed_date = datetime.now()
-    await user.game.asave(update_fields=("closed_date",))
+    await close_game(user.game)
     text, started = await start_game(user.room)
     if not started:
         await callback.answer(text=text)
@@ -219,10 +217,9 @@ async def close_game_handler(
     await callback.message.delete()
     if not user.game:
         return
-    user.game.closed_date = datetime.now()
+    await close_game(user.game)
     user.room.started = False
     await user.room.asave(update_fields=("started",))
-    await user.game.asave(update_fields=("closed_date",))
     await User.objects.filter(game=user.game).aupdate(game=None)
     async for player in (
         User.objects.select_related("room__admin").filter(room=user.room).all()

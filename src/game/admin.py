@@ -86,10 +86,10 @@ class UniqueCartsInline(admin.TabularInline):
     extra = 1
 
 
-class UserGameInline(admin.TabularInline):
-    """Инлайн модель пользователей в игре."""
+class CharacterGameInline(admin.TabularInline):
+    """Инлайн модель персонажей в игре."""
 
-    model = Game.users.through
+    model = Character
     extra = 1
 
 
@@ -100,7 +100,7 @@ class GameAdmin(admin.ModelAdmin):
     list_display = ("__str__", "created_date", "closed", "closed_date")
     list_filter = ("closed",)
     inlines = (
-        UserGameInline,
+        CharacterGameInline,
         InformationGameInline,
     )
 
