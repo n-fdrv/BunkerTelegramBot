@@ -40,13 +40,16 @@
 Отмените карту действия любого игрока,no_key,no_target,no_value
 Если Вас выгнали - уменьшите количество мест в бункере на 1,no_key,no_target,no_value
 Своруйте эффект карты действия любого игрока,no_key,no_target,no_value
-Перегенерируй свою профессию,generate,self,profession,True
-Перегенерируй свой пол,generate,self,gender,True
-Перегенерируй свой возраст,generate,self,age,True
-Перегенерируй свою ориентацию,generate,self,orientation,True
-Перегенерируй свое здоровье,generate,self,health,True
-Перегенерируй свое характер,generate,self,personality,True
-Перегенерируй свою фобию,generate,self,phobia,True
-Перегенерируй свое хобби,generate,self,hobby,True
-Перегенерируй свою доп. информацию,generate,self,add_info,True
-Перегенерируй свой багаж,generate,self,item,True
+Перегенерируй свою профессию,generate_cart,self,profession,True
+Перегенерируй свой пол,generate_cart,self,gender,True
+Перегенерируй свой возраст,generate_int,self,age,True
+Перегенерируй свою ориентацию,generate_cart,self,orientation,True
+Перегенерируй свое здоровье,generate_cart,self,health,True
+Перегенерируй свой характер,generate_cart,self,personality,True
+Перегенерируй свою фобию,generate_cart,self,phobia,True
+Перегенерируй свое хобби,generate_cart,self,hobby,True
+Перегенерируй свою доп. информацию,generate_cart,self,add_info,True
+Перегенерируй свой багаж,generate_cart,self,item,True
+Перегенерируй количество припасов,generate_int,self,bunker_supply,True
+Перегенерируй эпидемию,generate_bunker_cart,self,epidemia,True
+Перегенерируй тип бункера,generate_bunker_cart,self,bunker_type,True

@@ -7,7 +7,12 @@ class KeyAction(models.TextChoices):
     NO_KEY = "no_key", "Нет ключа"
     STEAL = "steal", "Украсть"
     CHANGE = "change", "Изменить"
-    GENERATE = "generate", "Сгенерировать"
+    GENERATE_INT = "generate_int", "Сгенерировать числовую информацию"
+    GENERATE_CART = "generate_cart", "Сгенерировать карту"
+    GENERATE_BUNKER_CART = (
+        "generate_bunker_cart",
+        "Сгенерировать карту бункера",
+    )
     TRADE = "trade", "Обмен"
     INFO = "info", "Информация"
     REVEAL = "reveal", "Раскрыть"
@@ -33,7 +38,7 @@ class ValueAction(models.TextChoices):
     EPIDEMIA = "epidemia", "Эпидемия"
     BUNKER_TYPE = "bunker_type", "Тип бункера"
     BUNKER_ROOM = "bunker_room", "Комната бункера"
-    BUNKER_SUPPLY = "bunker_suply", "Припасы в бункере"
+    BUNKER_SUPPLY = "bunker_supply", "Припасы в бункере"
     PROFESSION = "profession", "Профессия"
     AGE = "age", "Возраст"
     GENDER = "gender", "Пол"
@@ -316,4 +321,7 @@ class ActionCharacter(models.Model):
         verbose_name_plural = "Карточки действий персонажа"
 
     def __str__(self):
-        return f"{self.character.user} | {self.cart.name}"
+        cart = "Удалена"
+        if self.cart:
+            cart = self.cart.name
+        return f"{self.character.user} | {cart}"

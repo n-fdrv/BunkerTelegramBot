@@ -4,6 +4,7 @@ from django.conf import settings
 
 from game.models import Character, Game, InformationCart, TypeInformationCarts
 from game.utils.cart import (
+    generate_age,
     get_random_action_cart,
     get_random_information_cart,
     get_random_unique_information_cart,
@@ -15,7 +16,6 @@ from bot.models import User
 
 async def create_character(user: User, game: Game):
     """Метод генерации случайного персонажа."""
-    age = randint(settings.AVERAGE_AGE_VALUE, settings.MAX_AGE_VALUE)
     gender = await get_random_information_cart(TypeInformationCarts.GENDER)
     profession = await get_random_unique_information_cart(
         TypeInformationCarts.PROFESSION, game
@@ -55,10 +55,10 @@ async def create_character(user: User, game: Game):
         orientation = await get_random_unique_information_cart(
             TypeInformationCarts.ORIENTATION, game
         )
-    if randint(1, 100) <= settings.YOUNG_AGE_CHANCE:
-        age = randint(settings.MIN_AGE_VALUE, settings.AVERAGE_AGE_VALUE)
 
-    character = await Character.objects.acreate(user=user, age=age, game=game)
+    character = await Character.objects.acreate(
+        user=user, age=await generate_age(), game=game
+    )
     await character.information_carts.aadd(
         gender,
         profession,

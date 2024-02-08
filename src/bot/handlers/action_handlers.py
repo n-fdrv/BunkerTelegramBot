@@ -1,6 +1,6 @@
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
-from game.models import ActionCart, Character, TargetAction
+from game.models import ActionCart, ActionCharacter, Character, TargetAction
 from game.utils.cart import check_is_used_cart, use_action_cart
 from game.utils.character import get_character, get_character_info_text
 
@@ -60,9 +60,11 @@ async def action_get(
     await state.update_data(target=[character])
     if cart.target == TargetAction.ALL:
         target_data = []
-        async for target in Character.objects.select_related("game").filter(
-            game=user.game
-        ).aall():
+        async for target in (
+            Character.objects.select_related("game")
+            .filter(game=user.game)
+            .aall()
+        ):
             target_data.append(target)
         await state.update_data(target=target_data)
     keyboard = await action_keyboards.cart_confirmation_keyboard(callback_data)
@@ -85,7 +87,15 @@ async def use_cart(
     user = await get_user(callback.from_user.id)
     cart = await ActionCart.objects.aget(pk=callback_data.id)
     data = await state.get_data()
-    await use_action_cart(cart, data["target"])
+    character = await get_character(user)
+    character_action = (
+        await ActionCharacter.objects.select_related(
+            "cart", "character", "character__game"
+        )
+        .filter(cart=cart, character=character)
+        .alast()
+    )
+    await use_action_cart(character_action, data["target"])
     keyboard = await game_keyboard(user)
     character = await get_character(user)
     await callback.message.edit_text(

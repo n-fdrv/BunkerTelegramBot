@@ -39,7 +39,7 @@ class ActionCartAdmin(admin.ModelAdmin):
 
     list_display = ("name", "key", "target", "value", "is_active")
     list_display_links = ("name",)
-    list_filter = ("is_active",)
+    list_filter = ("is_active", "key")
     search_fields = ("name",)
 
 
@@ -67,9 +67,9 @@ class CharacterAdmin(admin.ModelAdmin):
     empty_value_display = "Удален"
     inlines = (InformationCharacterInline, ActionCharacterInline)
 
-    # def has_change_permission(self, request, obj=None):
-    #     """Запрещает менять объект."""
-    #     return False
+    def has_change_permission(self, request, obj=None):
+        """Запрещает менять объект."""
+        return False
 
 
 class InformationGameInline(admin.TabularInline):
@@ -99,10 +99,7 @@ class GameAdmin(admin.ModelAdmin):
 
     list_display = ("__str__", "created_date", "closed", "closed_date")
     list_filter = ("closed",)
-    inlines = (
-        CharacterGameInline,
-        InformationGameInline,
-    )
+    inlines = (CharacterGameInline, InformationGameInline, UniqueCartsInline)
 
     def has_change_permission(self, request, obj=None):
         """Запрещает менять объект."""
