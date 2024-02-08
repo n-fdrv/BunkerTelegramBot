@@ -241,6 +241,10 @@ async def game_all_info_keyboard(
             action=game_action.get_epidemia, id=user.game.pk
         ),
     )
+    keyboard.button(
+        text=buttons.ACTION_LIST_BUTTON,
+        callback_data=ActionCartCallbackData(action=action_cart_action.list),
+    )
     if user.room.admin == user:
         keyboard.button(
             text=buttons.ROOM_SETTINGS_BUTTON,
