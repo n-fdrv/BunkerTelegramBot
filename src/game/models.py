@@ -111,6 +111,9 @@ class ActionCart(models.Model):
         default=ValueAction.NO_VALUE,
         verbose_name="Переменная действия",
     )
+    is_active = models.BooleanField(
+        default=False, verbose_name="Активная карта"
+    )
 
     class Meta:
         verbose_name = "Карта Действия"
@@ -306,6 +309,7 @@ class ActionCharacter(models.Model):
     character = models.ForeignKey(
         Character, on_delete=models.CASCADE, verbose_name="Персонаж"
     )
+    is_used = models.BooleanField(default=False, verbose_name="Ипользована")
 
     class Meta:
         verbose_name = "Карточка действий персонажа"

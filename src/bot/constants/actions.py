@@ -56,7 +56,7 @@ class GameAction(Action):
 class ActionCartAction(Action):
     """Действия для callback_data действий."""
 
-    pass
+    use_cart = "ac-us"
 
 
 room_action = RoomAction("r")

@@ -76,7 +76,9 @@ async def create_character(user: User, game: Game):
 
 async def get_character(user: User) -> Character:
     """Метод получения персонажа из базы данных."""
-    return await Character.objects.aget(user=user, game=user.game)
+    return await Character.objects.select_related("game").aget(
+        user=user, game=user.game
+    )
 
 
 async def get_info_cart_text(character: Character, cart_type):

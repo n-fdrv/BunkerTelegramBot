@@ -1,6 +1,7 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from game.models import Character
 
+from bot.constants import buttons
 from bot.constants.actions import action_cart_action, game_action
 from bot.constants.callback_data import (
     ActionCartCallbackData,
@@ -15,12 +16,34 @@ async def action_list_keyboard(character: Character):
         keyboard.button(
             text=cart.name,
             callback_data=ActionCartCallbackData(
-                action=action_cart_action.get,
-                key=cart.key,
-                target=cart.target,
-                value=cart.value,
+                action=action_cart_action.get, id=cart.id
             ),
         )
     keyboard = await back_builder(keyboard, game_action.get_epidemia)
+    keyboard.adjust(1)
+    return keyboard
+
+
+async def not_active_cart_keyboard():
+    """Клавиатура не активной карты."""
+    keyboard = InlineKeyboardBuilder()
+    keyboard = await back_builder(keyboard, action_cart_action.list)
+    return keyboard
+
+
+async def cart_confirmation_keyboard(callback_data: ActionCartCallbackData):
+    """Клавиатура подстверждения использования карты."""
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(
+        text=buttons.YES_BUTTON,
+        callback_data=ActionCartCallbackData(
+            action=action_cart_action.use_cart,
+            id=callback_data.id,
+        ),
+    )
+    keyboard.button(
+        text=buttons.NO_BUTTON,
+        callback_data=ActionCartCallbackData(action=action_cart_action.list),
+    )
     keyboard.adjust(1)
     return keyboard

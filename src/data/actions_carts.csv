@@ -40,13 +40,13 @@
 Отмените карту действия любого игрока,no_key,no_target,no_value
 Если Вас выгнали - уменьшите количество мест в бункере на 1,no_key,no_target,no_value
 Своруйте эффект карты действия любого игрока,no_key,no_target,no_value
-Перегенерируй свою профессию,generate,self,profession
-Перегенерируй свой пол,generate,self,gender
-Перегенерируй свой возраст,generate,self,age
-Перегенерируй свою ориентацию,generate,self,orientation
-Перегенерируй свое здоровье,generate,self,health
-Перегенерируй свое характер,generate,self,personality
-Перегенерируй свою фобию,generate,self,phobia
-Перегенерируй свое хобби,generate,self,hobby
-Перегенерируй свою доп. информацию,generate,self,add_info
-Перегенерируй свой багаж,generate,self,item
+Перегенерируй свою профессию,generate,self,profession,True
+Перегенерируй свой пол,generate,self,gender,True
+Перегенерируй свой возраст,generate,self,age,True
+Перегенерируй свою ориентацию,generate,self,orientation,True
+Перегенерируй свое здоровье,generate,self,health,True
+Перегенерируй свое характер,generate,self,personality,True
+Перегенерируй свою фобию,generate,self,phobia,True
+Перегенерируй свое хобби,generate,self,hobby,True
+Перегенерируй свою доп. информацию,generate,self,add_info,True
+Перегенерируй свой багаж,generate,self,item,True

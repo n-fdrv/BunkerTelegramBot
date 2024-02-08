@@ -55,6 +55,7 @@ def log_in_dev(func: object) -> object:
                 f"{func_type}: {func.__name__} | "
                 f"Exception: {e.args}"
             )
+            raise e
             asyncio.ensure_future(
                 message.bot.send_message(
                     chat_id=settings.ADMIN_TELEGRAM_ID,

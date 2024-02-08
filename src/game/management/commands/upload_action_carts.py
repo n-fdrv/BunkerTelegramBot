@@ -18,8 +18,16 @@ class Command(BaseCommand):
             reader = csv.reader(f)
             for row in reader:
                 try:
+                    active = False
+                    active_position = 4
+                    if len(row) > active_position:
+                        active = row[4]
                     ActionCart.objects.get_or_create(
-                        name=row[0], key=row[1], target=row[2], value=row[3]
+                        name=row[0],
+                        key=row[1],
+                        target=row[2],
+                        value=row[3],
+                        is_active=active,
                     )
                 except Exception as e:
                     logger.error(
