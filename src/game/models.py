@@ -7,6 +7,7 @@ class KeyAction(models.TextChoices):
     NO_KEY = "no_key", "Нет ключа"
     STEAL = "steal", "Украсть"
     CHANGE = "change", "Изменить"
+    GENERATE = "generate", "Сгенерировать"
     TRADE = "trade", "Обмен"
     INFO = "info", "Информация"
     REVEAL = "reveal", "Раскрыть"

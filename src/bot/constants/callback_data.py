@@ -30,8 +30,17 @@ class GameCallbackData(BaseCallbackData, prefix="g"):
     pass
 
 
+class ActionCartCallbackData(BaseCallbackData, prefix="ac"):
+    """Callback_data для действий."""
+
+    key: Optional[str] = None
+    target: Optional[str] = None
+    value: Optional[str] = None
+
+
 CALLBACK_DATA_PREFIX = {
     RoomCallbackData.__prefix__: RoomCallbackData,
     GameCallbackData.__prefix__: GameCallbackData,
     StartCallbackData.__prefix__: StartCallbackData,
+    ActionCartCallbackData.__prefix__: ActionCartCallbackData,
 }

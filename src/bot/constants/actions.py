@@ -53,6 +53,13 @@ class GameAction(Action):
     close_game = "g-cg"
 
 
+class ActionCartAction(Action):
+    """Действия для callback_data действий."""
+
+    pass
+
+
 room_action = RoomAction("r")
 game_action = GameAction("g")
 start_action = StartAction("st")
+action_cart_action = ActionCartAction("ac")

@@ -3,8 +3,14 @@ from django.conf import settings
 from game.models import Room
 
 from bot.constants import buttons, messages
-from bot.constants.actions import game_action, room_action, start_action
+from bot.constants.actions import (
+    action_cart_action,
+    game_action,
+    room_action,
+    start_action,
+)
 from bot.constants.callback_data import (
+    ActionCartCallbackData,
     GameCallbackData,
     RoomCallbackData,
     StartCallbackData,
@@ -208,6 +214,10 @@ async def game_keyboard(user: User, callback_data: GameCallbackData = None):
         callback_data=GameCallbackData(
             action=game_action.get_all_info, id=user.game.pk
         ),
+    )
+    keyboard.button(
+        text=buttons.ACTION_LIST_BUTTON,
+        callback_data=ActionCartCallbackData(action=action_cart_action.list),
     )
     if user.room.admin == user:
         keyboard.button(
