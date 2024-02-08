@@ -43,7 +43,15 @@ class UserAdmin(DjangoObjectActions, admin.ModelAdmin):
     )
     list_filter = ("room",)
     search_fields = ("telegram_id", "telegram_username")
-    readonly_fields = (
-        "telegram_id",
-        "room",
-    )
+
+    def has_change_permission(self, request, obj=None):
+        """Запрещает изменять объект."""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Запрещает удалять объект."""
+        return False
+
+    def has_add_permission(self, request):
+        """Запрещает добавлять объект."""
+        return False
