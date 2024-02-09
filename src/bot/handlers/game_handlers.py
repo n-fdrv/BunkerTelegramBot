@@ -165,7 +165,7 @@ async def get_game_settings_handler(
     """Хендлер настроек игры."""
     user = await get_user(callback.from_user.id)
     text = await get_players_in_game_message(user.game)
-    keyboard = await game_settings_keyboard()
+    keyboard = await game_settings_keyboard(user)
     await callback.message.edit_text(
         text=text,
         reply_markup=keyboard.as_markup(),

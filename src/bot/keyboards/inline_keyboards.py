@@ -219,13 +219,12 @@ async def game_keyboard(user: User, callback_data: GameCallbackData = None):
         text=buttons.ACTION_LIST_BUTTON,
         callback_data=ActionCartCallbackData(action=action_cart_action.list),
     )
-    if user.room.admin == user:
-        keyboard.button(
-            text=buttons.ROOM_SETTINGS_BUTTON,
-            callback_data=GameCallbackData(
-                action=game_action.game_settings, id=user.game.pk
-            ),
-        )
+    keyboard.button(
+        text=buttons.ROOM_SETTINGS_BUTTON,
+        callback_data=GameCallbackData(
+            action=game_action.game_settings, id=user.game.pk
+        ),
+    )
     keyboard.adjust(1)
     return keyboard
 
@@ -256,17 +255,23 @@ async def game_all_info_keyboard(
     return keyboard
 
 
-async def game_settings_keyboard():
+async def game_settings_keyboard(user: User):
     """Метод формирования клавиатуры настроек игры."""
     keyboard = InlineKeyboardBuilder()
-    keyboard.button(
-        text=buttons.RELOAD_GAME_BUTTON,
-        callback_data=GameCallbackData(action=game_action.reload_game),
-    )
-    keyboard.button(
-        text=buttons.CLOSE_GAME_BUTTON,
-        callback_data=GameCallbackData(action=game_action.close_game),
-    )
+    if user.room.admin == user:
+        keyboard.button(
+            text=buttons.RELOAD_GAME_BUTTON,
+            callback_data=GameCallbackData(action=game_action.reload_game),
+        )
+        keyboard.button(
+            text=buttons.CLOSE_GAME_BUTTON,
+            callback_data=GameCallbackData(action=game_action.close_game),
+        )
+    else:
+        keyboard.button(
+            text=buttons.EXIT_ROOM_BUTTON,
+            callback_data=RoomCallbackData(action=room_action.exit_room),
+        )
     keyboard = await back_builder(keyboard, game_action.get_epidemia)
     keyboard.adjust(1)
     return keyboard
