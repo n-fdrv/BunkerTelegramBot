@@ -52,8 +52,8 @@ async def create_character(user: User, game: Game):
     if randint(1, 100) <= settings.ORIENTATION_CHANCE:
         orientation = await InformationCart.objects.aget(name="Гетеросексуал")
     else:
-        orientation = await get_random_unique_information_cart(
-            TypeInformationCarts.ORIENTATION, game
+        orientation = await get_random_information_cart(
+            TypeInformationCarts.ORIENTATION
         )
 
     character = await Character.objects.acreate(
