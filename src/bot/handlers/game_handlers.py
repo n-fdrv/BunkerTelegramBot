@@ -34,6 +34,9 @@ async def start_game_callback(
 ):
     """Хендлер начала игры."""
     user = await get_user(callback.from_user.id)
+    if not user.room:
+        await callback.message.edit_text(text=messages.NOT_IN_ROOM_MESSAGE)
+        return
     if user.game:
         await callback.message.delete()
         return
@@ -66,6 +69,9 @@ async def get_character_callback(
 ):
     """Хендлер просмотра персонажа."""
     user = await get_user(callback.from_user.id)
+    if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
+        return
     character = await get_character(user)
     keyboard = await game_keyboard(user, callback_data=callback_data)
     await callback.message.edit_text(
@@ -87,6 +93,9 @@ async def get_epidemia_callback(
     user = await User.objects.select_related("game", "room__admin").aget(
         telegram_id=callback.from_user.id
     )
+    if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
+        return
     keyboard = await game_keyboard(user, callback_data=callback_data)
     await callback.message.edit_text(
         text=messages.EPIDEMIA_GET_MESSAGE.format(
@@ -113,6 +122,9 @@ async def get_bunker_callback(
         "game",
         "room__admin",
     ).aget(telegram_id=callback.from_user.id)
+    if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
+        return
     keyboard = await game_keyboard(user, callback_data=callback_data)
     await callback.message.edit_text(
         text=await get_bunker_info_text(user.game),
@@ -134,6 +146,9 @@ async def get_all_info_callback(
         "game",
         "room__admin",
     ).aget(telegram_id=callback.from_user.id)
+    if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
+        return
     text = "<b>Эпидемия:</b>\n"
     text += messages.EPIDEMIA_GET_MESSAGE.format(
         await user.game.information_carts.filter(
@@ -164,6 +179,9 @@ async def get_game_settings_handler(
 ):
     """Хендлер настроек игры."""
     user = await get_user(callback.from_user.id)
+    if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
+        return
     text = await get_players_in_game_message(user.game)
     keyboard = await game_settings_keyboard(user)
     await callback.message.edit_text(
@@ -184,6 +202,9 @@ async def reload_game_handler(
 ):
     """Хендлер перезапуска игры."""
     user = await get_user(callback.from_user.id)
+    if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
+        return
     await close_game(user.game)
     text, started = await start_game(user.room)
     if not started:
@@ -216,6 +237,7 @@ async def close_game_handler(
     user = await get_user(callback.from_user.id)
     await callback.message.delete()
     if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
         return
     await close_game(user.game)
     user.room.started = False

@@ -4,6 +4,7 @@ from game.models import ActionCart, ActionCharacter, Character, TargetAction
 from game.utils.cart import check_is_used_cart, use_action_cart
 from game.utils.character import get_character, get_character_info_text
 
+from bot.constants import messages
 from bot.constants.actions import action_cart_action
 from bot.constants.callback_data import ActionCartCallbackData
 from bot.constants.messages_data import action_messages
@@ -26,6 +27,9 @@ async def action_list(
 ):
     """Хендлер списка карт."""
     user = await get_user(callback.from_user.id)
+    if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
+        return
     character = await get_character(user)
     keyboard = await action_keyboards.action_list_keyboard(character)
     await callback.message.edit_text(
@@ -44,6 +48,9 @@ async def action_get(
 ):
     """Хендлер получения определенной карты."""
     user = await get_user(callback.from_user.id)
+    if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
+        return
     character = await get_character(user)
     cart = await ActionCart.objects.aget(pk=callback_data.id)
     if not cart.is_active or await check_is_used_cart(character, cart):
@@ -89,6 +96,10 @@ async def choose_target(
     callback_data: ActionCartCallbackData,
 ):
     """Хендлер подверждения выбранной цели."""
+    user = await get_user(callback.from_user.id)
+    if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
+        return
     target = await get_user(callback_data.target)
     await state.update_data(target=[await get_character(target)])
     keyboard = await action_keyboards.cart_confirmation_keyboard(callback_data)
@@ -109,6 +120,9 @@ async def use_cart(
 ):
     """Хендлер использования карты."""
     user = await get_user(callback.from_user.id)
+    if not user.game:
+        await callback.message.edit_text(text=messages.NO_GAME_MESSAGE)
+        return
     cart = await ActionCart.objects.aget(pk=callback_data.id)
     data = await state.get_data()
     character = await get_character(user)

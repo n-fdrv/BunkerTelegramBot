@@ -214,6 +214,9 @@ async def show_players_callback(
     user = await User.objects.select_related("room", "room__admin").aget(
         telegram_id=callback.from_user.id
     )
+    if not user.room:
+        await callback.message.edit_text(text=messages.NOT_IN_ROOM_MESSAGE)
+        return
     keyboard = await inline_keyboards.show_players_keyboard(user.room)
     await callback.message.edit_reply_markup(reply_markup=keyboard.as_markup())
 
@@ -228,6 +231,12 @@ async def player_kick_callback(
     callback_data: RoomCallbackData,
 ):
     """Хендлер удаления игрока из комнаты."""
+    user = await User.objects.select_related("room", "room__admin").aget(
+        telegram_id=callback.from_user.id
+    )
+    if not user.room:
+        await callback.message.edit_text(text=messages.NOT_IN_ROOM_MESSAGE)
+        return
     kicked_user = await User.objects.select_related(
         "room", "room__admin"
     ).aget(telegram_id=callback_data.player_id)
