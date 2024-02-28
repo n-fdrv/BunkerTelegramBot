@@ -166,7 +166,7 @@ async def enter_room_slug_handler(message: types.Message, state: FSMContext):
     await message.answer(
         text=USER_ENTERED_ROOM_MESSAGE, reply_markup=keyboard.as_markup()
     )
-    admin_keyboard = await inline_keyboards.room_admin_keyboard()
+    admin_keyboard = await inline_keyboards.room_keyboard(user)
     await message.bot.send_message(
         chat_id=room.admin.telegram_id,
         text=USER_ENTERED_ROOM_ADMIN_MESSAGE.format(get_user_url(user)),

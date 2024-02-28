@@ -35,6 +35,9 @@ async def start_handler(message: types.Message, state: FSMContext):
     ).aget_or_create(
         telegram_id=message.from_user.id,
     )
+    if not created:
+        user.is_active = True
+        await user.asave(update_fields=("is_active",))
     user.first_name = message.from_user.first_name
     user.last_name = message.from_user.last_name
     user.telegram_username = message.from_user.username
@@ -89,4 +92,5 @@ async def block_handler(event: ChatMemberUpdated, state: FSMContext):
     """Хендлер при блокировке бота."""
     await state.clear()
     user = await get_user(event.from_user.id)
-    await user.adelete()
+    user.is_active = False
+    await user.asave(update_fields=("is_active",))

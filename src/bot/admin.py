@@ -39,7 +39,7 @@ class UserAdmin(DjangoObjectActions, admin.ModelAdmin):
         "room",
         "game",
         "registration_date",
-        "last_login_date",
+        "is_active",
     )
     list_filter = ("room",)
     search_fields = ("telegram_id", "telegram_username")

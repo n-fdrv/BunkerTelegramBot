@@ -37,11 +37,8 @@ class User(models.Model):
     registration_date = models.DateField(
         auto_now_add=True, verbose_name="Дата регистрации"
     )
-    last_login_date = models.DateField(
-        auto_now=True, verbose_name="Заходил в последний раз"
-    )
-    is_admin = models.BooleanField(
-        default=False, verbose_name="Права администратора"
+    is_active = models.BooleanField(
+        default=True, verbose_name="Права администратора"
     )
 
     @property
